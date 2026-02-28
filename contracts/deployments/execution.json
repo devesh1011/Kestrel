@@ -1,0 +1,11 @@
+{
+  "network": "ctc_usc_testnet",
+  "chainId": 102036,
+  "WCTC": "0x978524ae39575aaf308330466d29419a2affeef6",
+  "HardwareYieldCore": "0x7daf425b9428ee97c1e52b094e2db42637265d73",
+  "LenderVault": "0x6d8807ae9e75ca4307df6e9d0b40bacadb5f7fca",
+  "RevenueEscrow": "0x39e86627b3438d141ba581581ae79416495eac80",
+  "RevenueUSC": "0x111ea01f8ffc0d9d2ba88578a45d762672db255a",
+  "oracleWorker": "0x9db2507a09137c9fbe3f9f5404d4858b5c67af6b",
+  "deployedAt": "2026-03-05T06:22:18.925Z"
+}
