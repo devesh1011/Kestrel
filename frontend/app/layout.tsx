@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "HardwareYield — DePIN Micro-Lending on Creditcoin",
+  title: "Kestrel — DePIN Micro-Lending on Creditcoin",
   description:
     "Node operators borrow CTC against on-chain reward history. Lenders earn yield.",
 };
@@ -26,12 +26,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >
         <Providers>
-          <Navbar />
+          {/* <Navbar /> */}
           <main className="min-h-screen">{children}</main>
         </Providers>
       </body>
