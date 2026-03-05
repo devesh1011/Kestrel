@@ -1,0 +1,156 @@
+export const hardwareYieldCoreAbi = [
+  {
+    inputs: [{ internalType: "uint256", name: "loanId", type: "uint256" }],
+    name: "accruedInterest",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "", type: "address" }],
+    name: "activeLoanId",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "uint256", name: "requestedAmount", type: "uint256" },
+      { internalType: "uint256", name: "escrowCommitBps", type: "uint256" },
+    ],
+    name: "applyForLoan",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "address", name: "nodeWallet", type: "address" }],
+    name: "getScore",
+    outputs: [
+      { internalType: "uint256", name: "avgDailyRevenue", type: "uint256" },
+      { internalType: "uint256", name: "maxLoanAmount", type: "uint256" },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    name: "loans",
+    outputs: [
+      { internalType: "address", name: "borrower", type: "address" },
+      { internalType: "uint256", name: "principal", type: "uint256" },
+      { internalType: "uint256", name: "interestRateBps", type: "uint256" },
+      { internalType: "uint256", name: "startTime", type: "uint256" },
+      { internalType: "uint256", name: "dueTime", type: "uint256" },
+      { internalType: "uint256", name: "repaid", type: "uint256" },
+      { internalType: "uint256", name: "escrowId", type: "uint256" },
+      { internalType: "uint256", name: "scoreAtOrigination", type: "uint256" },
+      {
+        internalType: "enum HardwareYieldCore.LoanStatus",
+        name: "status",
+        type: "uint8",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "nextLoanId",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "uint256", name: "loanId", type: "uint256" },
+      { internalType: "uint256", name: "amount", type: "uint256" },
+    ],
+    name: "repay",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "address", name: "", type: "address" },
+      { internalType: "uint256", name: "", type: "uint256" },
+    ],
+    name: "rewardHistory",
+    outputs: [
+      { internalType: "uint256", name: "amount", type: "uint256" },
+      { internalType: "uint256", name: "timestamp", type: "uint256" },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "uint256", name: "loanId", type: "uint256" }],
+    name: "triggerLiquidation",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "loanId",
+        type: "uint256",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "borrower",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "principal",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "totalOwed",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "dueTime",
+        type: "uint256",
+      },
+    ],
+    name: "LoanCreated",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "nodeWallet",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "timestamp",
+        type: "uint256",
+      },
+    ],
+    name: "RewardRecorded",
+    type: "event",
+  },
+] as const;
