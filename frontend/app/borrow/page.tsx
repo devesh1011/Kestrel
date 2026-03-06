@@ -57,13 +57,13 @@ const USC_TESTNET_ID = 102036;
 
 export default function BorrowPage() {
   return (
-    <div className="mx-auto max-w-5xl px-6 py-10">
-      <div className="mb-8">
-        <div className="mb-2 flex items-center gap-2">
-          <Cpu className="h-6 w-6 text-blue-400" />
-          <h1 className="text-3xl font-bold text-white">Borrow</h1>
+    <div className="space-y-6">
+      <div>
+        <div className="mb-1 flex items-center gap-2">
+          <Cpu className="h-5 w-5 text-blue-400" />
+          <h1 className="text-[20px] font-semibold text-white">Borrow</h1>
         </div>
-        <p className="text-zinc-400">
+        <p className="text-[13px] text-zinc-400">
           Node operators borrow CTC against verified on-chain reward history.
         </p>
       </div>
@@ -188,7 +188,7 @@ function BorrowContent() {
   return (
     <div className="space-y-6">
       {!address && (
-        <div className="rounded-xl border border-zinc-700 bg-zinc-900 px-6 py-10 text-center text-zinc-400">
+        <div className="rounded-[20px] border border-white/[0.06] bg-white/[0.04] px-6 py-10 text-center text-zinc-400">
           Connect your wallet to view your borrower profile.
         </div>
       )}
@@ -206,7 +206,7 @@ function BorrowContent() {
           {/* Reward History Chart */}
           <RewardHistoryChart rewards={rewardHistory} />
 
-          <Separator className="bg-zinc-800" />
+          <Separator className="bg-white/[0.06]" />
 
           {/* Active Loan or Application Form */}
           {hasActiveLoan && loan ? (
@@ -257,7 +257,7 @@ function CreditScoreCard({
   loading: boolean;
 }) {
   return (
-    <Card className="border-zinc-800 bg-zinc-900">
+    <Card className="border-white/[0.06] bg-white/[0.04]">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-white">
           <TrendingUp className="h-5 w-5 text-blue-400" />
@@ -271,7 +271,7 @@ function CreditScoreCard({
         <div>
           <p className="mb-1 text-xs text-zinc-500">Avg Daily Revenue</p>
           {loading ? (
-            <Skeleton className="h-6 w-24 bg-zinc-800" />
+            <Skeleton className="h-6 w-24 bg-white/10" />
           ) : (
             <p className="text-lg font-bold text-white">
               {parseFloat(formatUnits(avgDailyRevenue, 18)).toFixed(4)} CTC
@@ -281,7 +281,7 @@ function CreditScoreCard({
         <div>
           <p className="mb-1 text-xs text-zinc-500">Max Loan Amount</p>
           {loading ? (
-            <Skeleton className="h-6 w-24 bg-zinc-800" />
+            <Skeleton className="h-6 w-24 bg-white/10" />
           ) : (
             <p className="text-lg font-bold text-blue-400">
               {parseFloat(formatUnits(maxLoanAmount, 18)).toFixed(4)} CTC
@@ -291,7 +291,7 @@ function CreditScoreCard({
         <div>
           <p className="mb-1 text-xs text-zinc-500">Reward Events</p>
           {loading ? (
-            <Skeleton className="h-6 w-12 bg-zinc-800" />
+            <Skeleton className="h-6 w-12 bg-white/10" />
           ) : (
             <div className="flex items-center gap-2">
               <p className="text-lg font-bold text-white">{rewardCount}</p>
@@ -327,7 +327,7 @@ function RewardHistoryChart({
   rewards: Array<{ amount: number; date: string }>;
 }) {
   return (
-    <Card className="border-zinc-800 bg-zinc-900">
+    <Card className="border-white/[0.06] bg-white/[0.04]">
       <CardHeader>
         <CardTitle className="text-white">Reward History</CardTitle>
         <CardDescription className="text-zinc-400">
@@ -375,7 +375,7 @@ function RewardHistoryChart({
               />
               <Bar dataKey="amount" radius={[3, 3, 0, 0]}>
                 {rewards.map((_, i) => (
-                  <Cell key={i} fill="#3b82f6" />
+                  <Cell key={i} fill="#7dbbff" />
                 ))}
               </Bar>
             </BarChart>
@@ -485,7 +485,7 @@ function ActiveLoanCard({
 
   return (
     <Card
-      className={`border-zinc-800 bg-zinc-900 ${isOverdue ? "border-red-800/60" : ""}`}
+      className={`border-white/[0.06] bg-white/[0.04] ${isOverdue ? "!border-red-800/60" : ""}`}
     >
       <CardHeader>
         <div className="flex items-center justify-between">
@@ -542,11 +542,11 @@ function ActiveLoanCard({
           </div>
           <Progress
             value={pctRepaid}
-            className="h-2 bg-zinc-800 [&>div]:bg-blue-500"
+            className="h-2 bg-white/10 [&>div]:bg-sky-500"
           />
         </div>
 
-        <Separator className="bg-zinc-800" />
+        <Separator className="bg-white/[0.06]" />
 
         <div className="space-y-3">
           <p className="text-sm font-medium text-zinc-300">Repay Loan</p>
@@ -558,7 +558,7 @@ function ActiveLoanCard({
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setRepayAmt(e.target.value)
               }
-              className="border-zinc-700 bg-zinc-800 text-white placeholder:text-zinc-500"
+              className="border-white/[0.10] bg-white/[0.05] text-white placeholder:text-zinc-500"
               min="0"
               step="0.0001"
             />
@@ -566,7 +566,7 @@ function ActiveLoanCard({
               onClick={() => setRepayAmt(formatUnits(totalOwed, 18))}
               variant="outline"
               size="sm"
-              className="shrink-0 border-zinc-700 bg-zinc-800 text-zinc-300 hover:text-white"
+              className="shrink-0 border-white/[0.10] bg-white/[0.05] text-zinc-300 hover:text-white"
             >
               Full
             </Button>
@@ -692,7 +692,7 @@ function LoanApplicationForm({
   const overLimit = requestedParsed > maxLoanAmount && maxLoanAmount > 0n;
 
   return (
-    <Card className="border-zinc-800 bg-zinc-900">
+    <Card className="border-white/[0.06] bg-white/[0.04]">
       <CardHeader>
         <CardTitle className="text-white">Apply for a Loan</CardTitle>
         <CardDescription className="text-zinc-400">
@@ -721,7 +721,7 @@ function LoanApplicationForm({
               setRequestedAmt(e.target.value)
             }
             disabled={!eligible}
-            className="border-zinc-700 bg-zinc-800 text-white placeholder:text-zinc-500 disabled:opacity-40"
+            className="border-white/[0.10] bg-white/[0.05] text-white placeholder:text-zinc-500 disabled:opacity-40"
             min="0"
             max={maxFloat}
             step="0.0001"
@@ -857,7 +857,7 @@ function SimulateRewardButton({
   }
 
   return (
-    <Card className="border-dashed border-zinc-700 bg-zinc-900/50">
+    <Card className="border-dashed border-white/[0.10] bg-white/[0.04]">
       <CardContent className="flex items-center justify-between p-4">
         <div>
           <p className="text-sm font-medium text-zinc-300">

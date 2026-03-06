@@ -57,13 +57,13 @@ interface YieldDay {
 
 export default function LendPage() {
   return (
-    <div className="mx-auto max-w-5xl px-6 py-10">
-      <div className="mb-8">
-        <div className="mb-2 flex items-center gap-2">
-          <TrendingUp className="h-6 w-6 text-emerald-400" />
-          <h1 className="text-3xl font-bold text-white">Lend</h1>
+    <div className="space-y-6">
+      <div>
+        <div className="mb-1 flex items-center gap-2">
+          <TrendingUp className="h-5 w-5 text-emerald-400" />
+          <h1 className="text-[20px] font-semibold text-white">Lend</h1>
         </div>
-        <p className="text-zinc-400">
+        <p className="text-[13px] text-zinc-400">
           Deposit WCTC into the ERC-4626 vault and earn interest from DePIN node
           loans.
         </p>
@@ -271,7 +271,7 @@ function LendContent() {
     <div className="space-y-6">
       {/* Position & vault stats */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <Card className="border-zinc-800 bg-zinc-900">
+        <Card className="border-white/[0.06] bg-white/[0.04]">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-zinc-400">
               Your Position
@@ -281,7 +281,7 @@ function LendContent() {
             {!address ? (
               <p className="text-sm text-zinc-500">Connect wallet</p>
             ) : isLoading ? (
-              <Skeleton className="h-7 w-28 bg-zinc-800" />
+              <Skeleton className="h-7 w-28 bg-white/10" />
             ) : (
               <>
                 <p className="text-2xl font-bold text-white">
@@ -295,7 +295,7 @@ function LendContent() {
           </CardContent>
         </Card>
 
-        <Card className="border-zinc-800 bg-zinc-900">
+        <Card className="border-white/[0.06] bg-white/[0.04]">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-zinc-400">
               Vault TVL
@@ -303,7 +303,7 @@ function LendContent() {
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <Skeleton className="h-7 w-28 bg-zinc-800" />
+              <Skeleton className="h-7 w-28 bg-white/10" />
             ) : (
               <>
                 <p className="text-2xl font-bold text-white">
@@ -318,7 +318,7 @@ function LendContent() {
           </CardContent>
         </Card>
 
-        <Card className="border-zinc-800 bg-zinc-900">
+        <Card className="border-white/[0.06] bg-white/[0.04]">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-zinc-400">
               All-Time Interest
@@ -326,7 +326,7 @@ function LendContent() {
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <Skeleton className="h-7 w-28 bg-zinc-800" />
+              <Skeleton className="h-7 w-28 bg-white/10" />
             ) : (
               <p className="text-2xl font-bold text-emerald-400">
                 {parseFloat(formatUnits(totalInterestEarned, 18)).toFixed(4)}{" "}
@@ -338,7 +338,7 @@ function LendContent() {
       </div>
 
       {/* Deposit / Withdraw */}
-      <Card className="border-zinc-800 bg-zinc-900">
+      <Card className="border-white/[0.06] bg-white/[0.04]">
         <CardHeader>
           <CardTitle className="text-white">Manage Position</CardTitle>
           <CardDescription className="text-zinc-400">
@@ -347,7 +347,7 @@ function LendContent() {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="deposit">
-            <TabsList className="mb-6 bg-zinc-800">
+            <TabsList className="mb-6 bg-white/[0.05]">
               <TabsTrigger value="deposit">
                 <ArrowDownToLine className="mr-2 h-4 w-4" />
                 Deposit
@@ -375,7 +375,7 @@ function LendContent() {
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setDepositAmt(e.target.value)
                   }
-                  className="border-zinc-700 bg-zinc-800 text-white placeholder:text-zinc-500"
+                  className="border-white/[0.10] bg-white/[0.05] text-white placeholder:text-zinc-500"
                   min="0"
                   step="0.0001"
                 />
@@ -385,7 +385,7 @@ function LendContent() {
                   }
                   variant="outline"
                   size="sm"
-                  className="shrink-0 border-zinc-700 bg-zinc-800 text-zinc-300 hover:text-white"
+                  className="shrink-0 border-white/[0.10] bg-white/[0.05] text-zinc-300 hover:text-white"
                 >
                   Max
                 </Button>
@@ -448,7 +448,7 @@ function LendContent() {
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setWithdrawAmt(e.target.value)
                   }
-                  className="border-zinc-700 bg-zinc-800 text-white placeholder:text-zinc-500"
+                  className="border-white/[0.10] bg-white/[0.05] text-white placeholder:text-zinc-500"
                   min="0"
                   step="0.0001"
                 />
@@ -458,7 +458,7 @@ function LendContent() {
                   }
                   variant="outline"
                   size="sm"
-                  className="shrink-0 border-zinc-700 bg-zinc-800 text-zinc-300 hover:text-white"
+                  className="shrink-0 border-white/[0.10] bg-white/[0.05] text-zinc-300 hover:text-white"
                 >
                   Max
                 </Button>
@@ -495,10 +495,10 @@ function LendContent() {
         </CardContent>
       </Card>
 
-      <Separator className="bg-zinc-800" />
+      <Separator className="bg-white/[0.06]" />
 
       {/* Yield history chart */}
-      <Card className="border-zinc-800 bg-zinc-900">
+      <Card className="border-white/[0.06] bg-white/[0.04]">
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle className="text-white">Yield History</CardTitle>
@@ -521,7 +521,7 @@ function LendContent() {
         <CardContent>
           {yieldLoading ? (
             <div className="flex h-40 items-center justify-center">
-              <Skeleton className="h-40 w-full bg-zinc-800" />
+              <Skeleton className="h-40 w-full bg-white/10" />
             </div>
           ) : yieldHistory.length === 0 ? (
             <div className="flex h-40 items-center justify-center text-zinc-500 text-sm">
@@ -562,7 +562,7 @@ function LendContent() {
                 />
                 <Bar dataKey="amount" radius={[3, 3, 0, 0]}>
                   {yieldHistory.map((_, i) => (
-                    <Cell key={i} fill="#10b981" />
+                    <Cell key={i} fill="#6be6d3" />
                   ))}
                 </Bar>
               </BarChart>
@@ -572,7 +572,7 @@ function LendContent() {
       </Card>
 
       {/* WCTC wrap helper */}
-      <Card className="border-zinc-800 bg-zinc-900">
+      <Card className="border-white/[0.06] bg-white/[0.04]">
         <CardHeader>
           <CardTitle className="text-sm font-medium text-white">
             Wrap CTC → WCTC
@@ -623,7 +623,7 @@ function WrapCTC({
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setAmount(e.target.value)
           }
-          className="border-zinc-700 bg-zinc-800 text-white placeholder:text-zinc-500"
+          className="border-white/[0.10] bg-white/[0.05] text-white placeholder:text-zinc-500"
           min="0"
           step="0.0001"
         />
@@ -638,7 +638,7 @@ function WrapCTC({
           }}
           disabled={!amount || confirming}
           variant="outline"
-          className="shrink-0 border-zinc-700 bg-zinc-800 text-zinc-300 hover:text-white"
+          className="shrink-0 border-white/[0.10] bg-white/[0.05] text-zinc-300 hover:text-white"
         >
           {confirming ? "Wrapping…" : "Wrap"}
         </Button>
