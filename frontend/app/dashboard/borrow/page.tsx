@@ -430,34 +430,7 @@ function ActiveLoanCard({
         )
       : 0;
 
-  const { writeContract: approveTx, data: approveHash } = useWriteContract();
   const { writeContract: repayTx, data: repayHash } = useWriteContract();
-
-  const { data: allowanceData } = useReadContract({
-    ...wctcContract,
-    functionName: "allowance",
-    args:
-      address && HARDWARE_YIELD_CORE_ADDRESS
-        ? [address, HARDWARE_YIELD_CORE_ADDRESS]
-        : undefined,
-    query: { enabled: !!address },
-  });
-  const allowance = (allowanceData ?? 0n) as bigint;
-
-  const { isLoading: approveConfirming, isSuccess: approveConfirmed } =
-    useWaitForTransactionReceipt({ hash: approveHash });
-  const { isLoading: repayConfirming, isSuccess: repayConfirmed } =
-    useWaitForTransactionReceipt({ hash: repayHash });
-
-  useEffect(() => {
-    if (repayConfirmed) {
-      toast.success("Repayment confirmed!");
-      onRepaid();
-    }
-    if (approveConfirmed) {
-      toast.success("Approval confirmed! Now repay.");
-    }
-  }, [repayConfirmed, approveConfirmed, onRepaid]);
 
   const repayAmountParsed = repayAmt
     ? (() => {
@@ -468,23 +441,24 @@ function ActiveLoanCard({
         }
       })()
     : 0n;
-  const needsApproval = repayAmountParsed > 0n && allowance < repayAmountParsed;
+
+  const { isLoading: repayConfirming, isSuccess: repayConfirmed } =
+    useWaitForTransactionReceipt({ hash: repayHash });
+
+  useEffect(() => {
+    if (repayConfirmed) {
+      toast.success("Repayment confirmed!");
+      onRepaid();
+    }
+  }, [repayConfirmed, onRepaid]);
 
   function handleRepay() {
-    if (!repayAmt) return;
-    if (needsApproval) {
-      approveTx({
-        ...wctcContract,
-        functionName: "approve",
-        args: [HARDWARE_YIELD_CORE_ADDRESS, repayAmountParsed],
-      });
-    } else {
-      repayTx({
-        ...hardwareYieldCoreContract,
-        functionName: "repay",
-        args: [loanId, repayAmountParsed],
-      });
-    }
+    if (!repayAmt || repayAmountParsed === 0n) return;
+    repayTx({
+      ...hardwareYieldCoreContract,
+      functionName: "repay",
+      args: [loanId, repayAmountParsed],
+    });
   }
 
   return (
@@ -577,30 +551,12 @@ function ActiveLoanCard({
           </div>
           <Button
             onClick={handleRepay}
-            disabled={!repayAmt || repayConfirming || approveConfirming}
+            disabled={!repayAmt || repayConfirming}
             className="w-full bg-blue-600 hover:bg-blue-500 text-white disabled:opacity-50"
           >
-            {approveConfirming
-              ? "Approving…"
-              : repayConfirming
-                ? "Repaying…"
-                : needsApproval
-                  ? "Approve WCTC"
-                  : "Repay"}
+            {repayConfirming ? "Repaying…" : "Repay"}
           </Button>
           <div className="flex flex-wrap gap-2">
-            {approveHash && (
-              <TxStatusBadge
-                status={
-                  approveConfirming
-                    ? "pending"
-                    : approveConfirmed
-                      ? "confirmed"
-                      : "pending"
-                }
-                txHash={approveHash}
-              />
-            )}
             {repayHash && (
               <TxStatusBadge
                 status={
