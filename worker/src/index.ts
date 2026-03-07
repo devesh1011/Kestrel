@@ -1,5 +1,6 @@
 import "dotenv/config";
-import { WebSocketProvider, JsonRpcProvider, Contract, ethers } from "ethers";
+import { WebSocketProvider, JsonRpcProvider, Contract } from "ethers";
+import { chainInfo } from "@gluwa/cc-next-query-builder";
 import type { PendingReward } from "./types.js";
 import { waitForAttestation } from "./attestation.js";
 import { fetchProof, ProofNotReadyError } from "./proofApi.js";
@@ -19,7 +20,12 @@ let rewardQueue: PendingReward[] = [];
 function loadQueue() {
   if (fs.existsSync(QUEUE_FILE)) {
     try {
-      rewardQueue = JSON.parse(fs.readFileSync(QUEUE_FILE, "utf8"));
+      const raw = JSON.parse(fs.readFileSync(QUEUE_FILE, "utf8"));
+      rewardQueue = raw.map((item: any) => ({
+        ...item,
+        blockNumber: BigInt(item.blockNumber),
+        amount: BigInt(item.amount),
+      }));
       console.log(`Loaded ${rewardQueue.length} items from queue file.`);
     } catch (e) {
       console.error("Failed to load queue file:", e);
@@ -28,14 +34,22 @@ function loadQueue() {
 }
 
 function saveQueue() {
-  fs.writeFileSync(QUEUE_FILE, JSON.stringify(rewardQueue, null, 2));
+  const serializable = rewardQueue.map((item) => ({
+    ...item,
+    blockNumber: item.blockNumber.toString(),
+    amount: item.amount.toString(),
+  }));
+  fs.writeFileSync(QUEUE_FILE, JSON.stringify(serializable, null, 2));
 }
 
 async function startWorker() {
   const cc3Wss = process.env.CC3_WSS_RPC;
   const cc3Https = process.env.CC3_HTTPS_RPC;
   const emitterAddress = process.env.SPACE_REWARD_EMITTER;
-  const sourceChainId = parseInt(process.env.SOURCE_CHAIN_ID || "102031");
+  // SOURCE_CHAIN_KEY is the USC oracle chain key; fall back to SOURCE_CHAIN_ID for compat
+  const chainKey = parseInt(
+    process.env.SOURCE_CHAIN_KEY ?? process.env.SOURCE_CHAIN_ID ?? "102031",
+  );
 
   if (!cc3Wss || !cc3Https || !emitterAddress) {
     throw new Error("Environment variables for CC3 not set");
@@ -43,8 +57,22 @@ async function startWorker() {
 
   loadQueue();
 
+  // Log supported chains so we can confirm the correct chain key at startup
+  const uscProvider = new JsonRpcProvider(process.env.USC_RPC, {
+    chainId: 102036,
+    name: "ctc-usc-testnet",
+  });
+  try {
+    const chainInfoProvider = new chainInfo.PrecompileChainInfoProvider(
+      uscProvider,
+    );
+    const supported = await chainInfoProvider.getSupportedChains();
+    console.log("USC supported chains:", JSON.stringify(supported));
+  } catch (e) {
+    console.warn("Could not fetch supported chains from USC precompile:", e);
+  }
+
   const cc3Provider = new WebSocketProvider(cc3Wss);
-  const cc3HttpsProvider = new JsonRpcProvider(cc3Https);
   const rewardEmitter = new Contract(
     emitterAddress,
     REWARD_EMITTER_ABI,
@@ -52,7 +80,7 @@ async function startWorker() {
   );
 
   console.log(
-    `Worker listening for RewardClaimed events on CC3 @ ${emitterAddress}...`,
+    `Worker listening for RewardClaimed events on CC3 @ ${emitterAddress} (chain key: ${chainKey})...`,
   );
 
   rewardEmitter.on(
@@ -90,7 +118,9 @@ async function processQueue() {
   if (isProcessing || rewardQueue.length === 0) return;
   isProcessing = true;
 
-  const sourceChainId = parseInt(process.env.SOURCE_CHAIN_ID || "102031");
+  const chainKey = parseInt(
+    process.env.SOURCE_CHAIN_KEY ?? process.env.SOURCE_CHAIN_ID ?? "102031",
+  );
 
   for (let i = 0; i < rewardQueue.length; i++) {
     const reward = rewardQueue[i];
@@ -106,10 +136,10 @@ async function processQueue() {
       console.log(`Processing reward: ${reward.txHash}...`);
 
       // Step 1: Wait for block attestation
-      await waitForAttestation(reward.blockNumber, sourceChainId);
+      await waitForAttestation(reward.blockNumber, chainKey);
 
       // Step 2: Fetch proof from API
-      const proof = await fetchProof(reward.txHash, sourceChainId);
+      const proof = await fetchProof(reward.txHash, chainKey);
 
       // Step 3: Submit proof to USC
       await submitProof(reward, proof);
