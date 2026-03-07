@@ -425,4 +425,16 @@ contract HardwareYieldCore is Ownable, ReentrancyGuard {
         }
         return total;
     }
+
+    /// @notice Get the total number of currently active loans.
+    /// @return Number of loans with status Active.
+    function getActiveLoanCount() external view returns (uint256) {
+        uint256 count = 0;
+        for (uint256 i = 1; i < nextLoanId; i++) {
+            if (loans[i].status == LoanStatus.Active) {
+                count++;
+            }
+        }
+        return count;
+    }
 }

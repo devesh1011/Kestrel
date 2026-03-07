@@ -146,8 +146,9 @@ contract RevenueEscrow is Ownable, ReentrancyGuard {
         esc.totalRedirected += redirected;
 
         if (redirected > 0) {
-            // Transfer redirected share to vault
-            IERC20(wctc).transfer(lenderVault, redirected);
+            // HACKATHON DEMO: Skip WCTC transfer since token economics not implemented
+            // TODO: Implement WCTC minting/transfer when rewards are recorded
+            // IERC20(wctc).transfer(lenderVault, redirected);
         }
 
         emit RewardRedirected(escrowId, redirected, remaining);
@@ -164,7 +165,7 @@ contract RevenueEscrow is Ownable, ReentrancyGuard {
 
     /// @notice Close an escrow after full repayment.
     /// @param escrowId Escrow to close.
-    function closeEscrow(uint256 escrowId) external onlyCore {
+    function releaseEscrow(uint256 escrowId) external onlyCore {
         Escrow storage esc = escrows[escrowId];
         require(
             esc.status == EscrowStatus.Active ||
