@@ -50,13 +50,13 @@ if (!fs.existsSync(executionPath)) {
 const addrs = JSON.parse(fs.readFileSync(executionPath, "utf-8"));
 
 console.log("\nUsing addresses:");
-console.log("  KestrelCore:", addrs.KestrelCore);
+console.log("  HardwareYieldCore:", addrs.KestrelCore); // Note: JSON key is still KestrelCore but contract is HardwareYieldCore
 console.log("  LenderVault      :", addrs.LenderVault);
 console.log("  RevenueEscrow    :", addrs.RevenueEscrow);
 console.log("  RevenueUSC       :", addrs.RevenueUSC);
 
-// ── Attach to KestrelCore ────────────────────────────────────────────
-const core = await viem.getContractAt("KestrelCore", addrs.KestrelCore, {
+// ── Attach to HardwareYieldCore ────────────────────────────────────────────
+const core = await viem.getContractAt("HardwareYieldCore", addrs.KestrelCore, {
   client: { public: publicClient, wallet: deployer },
 });
 
@@ -89,7 +89,7 @@ const [uscSet, vaultSet, escrowSet] = await Promise.all([
   core.read.lenderVault(),
   core.read.revenueEscrow(),
 ]);
-console.log("\n─── Final KestrelCore state ───");
+console.log("\n─── Final HardwareYieldCore state ───");
 console.log("  uscContract  :", uscSet);
 console.log("  lenderVault  :", vaultSet);
 console.log("  revenueEscrow:", escrowSet);

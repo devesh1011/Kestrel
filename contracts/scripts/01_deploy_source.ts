@@ -62,8 +62,8 @@ if (!fs.existsSync(deploymentsDir))
   fs.mkdirSync(deploymentsDir, { recursive: true });
 
 const output = {
-  network: "ctc_testnet",
-  chainId: 102031,
+  network: network.name,
+  chainId: chain.id,
   SpaceRewardEmitter: emitter.address,
   deployedAt: new Date().toISOString(),
 };

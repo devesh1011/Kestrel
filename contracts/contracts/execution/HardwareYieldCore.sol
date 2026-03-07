@@ -406,4 +406,23 @@ contract HardwareYieldCore is Ownable, ReentrancyGuard {
             emit LoanRepaidInFull(loanId, loan.borrower);
         }
     }
+
+    /// @notice Get the number of verified reward events for a wallet.
+    /// @param wallet Node wallet to query.
+    /// @return Number of reward records in the current score window.
+    function getRewardCount(address wallet) external view returns (uint256) {
+        return rewardHistory[wallet].length;
+    }
+
+    /// @notice Get total rewards earned by a wallet in the current score window.
+    /// @param wallet Node wallet to query.
+    /// @return Total reward amount in WCTC (18 decimals).
+    function getTotalRewards(address wallet) external view returns (uint256) {
+        RewardRecord[] storage records = rewardHistory[wallet];
+        uint256 total = 0;
+        for (uint256 i = 0; i < records.length; i++) {
+            total += records[i].amount;
+        }
+        return total;
+    }
 }

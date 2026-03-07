@@ -19,10 +19,18 @@ export default defineConfig({
     profiles: {
       default: {
         version: "0.8.28",
+        settings: {
+          viaIR: true,
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+        },
       },
       production: {
         version: "0.8.28",
         settings: {
+          viaIR: true,
           optimizer: {
             enabled: true,
             runs: 200,
@@ -53,6 +61,14 @@ export default defineConfig({
       chainType: "l1",
       url: "https://rpc.usc-testnet2.creditcoin.network",
       chainId: 102036,
+      accounts: deployerKey ? [deployerKey] : [],
+    },
+
+    sepolia: {
+      type: "http",
+      chainType: "l1",
+      url: "https://ethereum-sepolia.publicnode.com",
+      chainId: 11155111,
       accounts: deployerKey ? [deployerKey] : [],
     },
   },

@@ -38,7 +38,7 @@ contract RevenueUSC {
     address public oracleWorker;
     /// @notice HardwareYieldCore contract to relay verified reward data into.
     address public hardwareYieldCore;
-    /// @notice Replay protection: keccak256(txData) => processed.
+    /// @notice Replay protection: keccak256(encodedTransaction) => processed.
     mapping(bytes32 => bool) public processedQueries;
 
     // ─── Events ───────────────────────────────────────────────────────────────
@@ -76,32 +76,58 @@ contract RevenueUSC {
     // ─── Core ─────────────────────────────────────────────────────────────────
 
     /// @notice Submit a proof that a RewardClaimed event occurred on the source chain
-    ///         (Creditcoin cc3 in production; Sepolia as testnet fallback).
-    ///         The call will revert if the proof is invalid or already processed.
+    ///         (Creditcoin cc3).  The call verifies the proof synchronously via the
+    ///         0x0FD2 BlockProver precompile, then relays reward data to KestrelCore.
     ///
-    /// @param txData          RLP-encoded raw transaction bytes from the source chain.
-    /// @param nodeWallet      Reward claimant (decoded off-chain from the RewardClaimed event).
-    /// @param amount          Reward amount from the RewardClaimed event.
-    /// @param timestamp       block.timestamp of the source tx (from the event).
-    /// @param merkleProof     Merkle branch proving inclusion in the block's tx root.
-    /// @param continuityProof Continuity chain from the tx block to a USC checkpoint.
+    /// @param chainKey            USC oracle chain key for the source chain (cc3).
+    /// @param blockHeight         Block number of the source-chain transaction.
+    /// @param encodedTransaction  RLP-encoded raw transaction bytes.
+    /// @param merkleRoot          Root of the Merkle proof.
+    /// @param siblings            Ordered Merkle siblings proving tx inclusion.
+    /// @param lowerEndpointDigest Starting digest of the continuity chain.
+    /// @param continuityRoots     Block digest roots linking to the checkpoint.
+    /// @param nodeWallet          Reward claimant (decoded by the oracle worker).
+    /// @param amount              Reward amount from the RewardClaimed event.
+    /// @param timestamp           block.timestamp of the source-chain event.
     function processRewardProof(
-        bytes calldata txData,
+        uint64 chainKey,
+        uint64 blockHeight,
+        bytes calldata encodedTransaction,
+        bytes32 merkleRoot,
+        INativeQueryVerifier.MerkleProofEntry[] calldata siblings,
+        bytes32 lowerEndpointDigest,
+        bytes32[] calldata continuityRoots,
         address nodeWallet,
         uint256 amount,
-        uint256 timestamp,
-        MerkleProofEntry[] calldata merkleProof,
-        ContinuityProof calldata continuityProof
+        uint256 timestamp
     ) external onlyOracle {
         require(nodeWallet != address(0), "RevenueUSC: zero node wallet");
         require(amount > 0, "RevenueUSC: amount must be > 0");
 
-        // Replay protection
-        bytes32 queryHash = keccak256(txData);
+        // Replay protection: hash the raw encoded transaction bytes
+        bytes32 queryHash = keccak256(encodedTransaction);
         require(!processedQueries[queryHash], "RevenueUSC: already processed");
 
-        // Verify the transaction was included in an attested source-chain block
-        bool valid = VERIFIER.verify(txData, merkleProof, continuityProof);
+        // Assemble proof structs expected by the precompile
+        INativeQueryVerifier.MerkleProof
+            memory merkleProof = INativeQueryVerifier.MerkleProof({
+                root: merkleRoot,
+                siblings: siblings
+            });
+        INativeQueryVerifier.ContinuityProof
+            memory continuityProof = INativeQueryVerifier.ContinuityProof({
+                lowerEndpointDigest: lowerEndpointDigest,
+                roots: continuityRoots
+            });
+
+        // Verify that the transaction was included in an attested source-chain block
+        bool valid = VERIFIER.verifyAndEmit(
+            chainKey,
+            blockHeight,
+            encodedTransaction,
+            merkleProof,
+            continuityProof
+        );
         require(valid, "RevenueUSC: proof verification failed");
 
         // Mark as processed before external call (CEI pattern)
@@ -115,6 +141,31 @@ contract RevenueUSC {
         );
 
         emit RewardVerified(nodeWallet, amount, timestamp, queryHash);
+    }
+
+    // ─── Demo Mode (for hackathon - skips verification) ────────────────────────
+
+    function recordRewardForDemo(
+        address nodeWallet,
+        uint256 amount,
+        uint256 timestamp
+    ) external onlyOracle {
+        require(nodeWallet != address(0), "RevenueUSC: zero node wallet");
+        require(amount > 0, "RevenueUSC: amount must be > 0");
+
+        // Demo mode: skip verification, just record the reward
+        IHardwareYieldCore(hardwareYieldCore).recordVerifiedReward(
+            nodeWallet,
+            amount,
+            timestamp
+        );
+
+        emit RewardVerified(
+            nodeWallet,
+            amount,
+            timestamp,
+            keccak256(abi.encodePacked("demo", nodeWallet, amount, timestamp))
+        );
     }
 
     // ─── Admin ────────────────────────────────────────────────────────────────

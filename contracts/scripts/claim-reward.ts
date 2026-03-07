@@ -2,7 +2,9 @@ import { ethers } from "ethers";
 
 async function main() {
   // Connect to cc3 testnet
-  const provider = new ethers.JsonRpcProvider(process.env.CC3_HTTPS_RPC);
+  const provider = new ethers.JsonRpcProvider(
+    "https://rpc.cc3-testnet.creditcoin.network",
+  );
   const wallet = new ethers.Wallet(process.env.DEPLOYER_PRIVATE_KEY!, provider);
 
   console.log("Connected wallet:", wallet.address);
