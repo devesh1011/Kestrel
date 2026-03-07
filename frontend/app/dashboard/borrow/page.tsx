@@ -56,6 +56,13 @@ import { creditcoinTestnet } from "@/lib/chains";
 const USC_TESTNET_ID = 102036;
 
 export default function BorrowPage() {
+  const { address } = useAccount();
+
+  function handleRewardDone() {
+    // BorrowContent will refetch on its own via its own polling / refetch calls
+    // Nothing to do here at the page level
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -67,6 +74,11 @@ export default function BorrowPage() {
           Node operators borrow CTC against verified on-chain reward history.
         </p>
       </div>
+
+      {/* SimulateRewardButton lives OUTSIDE NetworkGuard so it survives the cc3 network switch */}
+      {process.env.NODE_ENV === "development" && address && (
+        <SimulateRewardButton address={address} onDone={handleRewardDone} />
+      )}
 
       <NetworkGuard>
         <BorrowContent />
@@ -84,6 +96,9 @@ const LOAN_STATUS: Record<number, string> = {
 
 function BorrowContent() {
   const { address } = useAccount();
+
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const {
     data: activeLoanIdRaw,
@@ -135,7 +150,17 @@ function BorrowContent() {
   });
 
   const loan = loanData?.[0]?.result as
-    | readonly [string, bigint, bigint, bigint, bigint, bigint, bigint, bigint, number]
+    | readonly [
+        string,
+        bigint,
+        bigint,
+        bigint,
+        bigint,
+        bigint,
+        bigint,
+        bigint,
+        number,
+      ]
     | undefined;
   const accruedInterest = (loanData?.[1]?.result ?? 0n) as bigint;
 
@@ -173,13 +198,13 @@ function BorrowContent() {
 
   return (
     <div className="space-y-6">
-      {!address && (
+      {(!mounted || !address) && (
         <div className="rounded-[20px] border border-white/[0.06] bg-white/[0.04] px-6 py-10 text-center text-zinc-400">
           Connect your wallet to view your borrower profile.
         </div>
       )}
 
-      {address && (
+      {mounted && address && (
         <>
           <CreditScoreCard
             avgDailyRevenue={avgDailyRevenue}
@@ -197,23 +222,24 @@ function BorrowContent() {
               loanId={activeLoanId}
               loan={loan}
               accruedInterest={accruedInterest}
-              onRepaid={() => { refetchScore(); refetchLoan(); }}
+              onRepaid={() => {
+                refetchScore();
+                refetchLoan();
+              }}
             />
           ) : (
             <LoanApplicationForm
               address={address}
               maxLoanAmount={maxLoanAmount}
               rewardCount={rewardHistory.length}
-              onApplied={() => { refetchScore(); refetchLoan(); }}
+              onApplied={() => {
+                refetchScore();
+                refetchLoan();
+              }}
             />
           )}
 
-          {process.env.NODE_ENV === "development" && (
-            <SimulateRewardButton
-              address={address}
-              onDone={() => refetchScore()}
-            />
-          )}
+          {/* SimulateRewardButton moved to page level outside NetworkGuard */}
         </>
       )}
     </div>
@@ -309,13 +335,15 @@ function RewardHistoryChart({
       <CardHeader>
         <CardTitle className="text-white">Reward History</CardTitle>
         <CardDescription className="text-zinc-400">
-          On-chain verified rewards submitted by the oracle (up to 20 most recent)
+          On-chain verified rewards submitted by the oracle (up to 20 most
+          recent)
         </CardDescription>
       </CardHeader>
       <CardContent>
         {rewards.length === 0 ? (
           <div className="flex h-40 items-center justify-center text-sm text-zinc-500">
-            No verified rewards yet. Run the oracle worker to submit rewards from cc3.
+            No verified rewards yet. Run the oracle worker to submit rewards
+            from cc3.
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={200}>
@@ -371,7 +399,17 @@ function ActiveLoanCard({
   onRepaid,
 }: {
   loanId: bigint;
-  loan: readonly [string, bigint, bigint, bigint, bigint, bigint, bigint, bigint, number];
+  loan: readonly [
+    string,
+    bigint,
+    bigint,
+    bigint,
+    bigint,
+    bigint,
+    bigint,
+    bigint,
+    number,
+  ];
   accruedInterest: bigint;
   onRepaid: () => void;
 }) {
@@ -412,12 +450,23 @@ function ActiveLoanCard({
     useWaitForTransactionReceipt({ hash: repayHash });
 
   useEffect(() => {
-    if (repayConfirmed) { toast.success("Repayment confirmed!"); onRepaid(); }
-    if (approveConfirmed) { toast.success("Approval confirmed! Now repay."); }
+    if (repayConfirmed) {
+      toast.success("Repayment confirmed!");
+      onRepaid();
+    }
+    if (approveConfirmed) {
+      toast.success("Approval confirmed! Now repay.");
+    }
   }, [repayConfirmed, approveConfirmed, onRepaid]);
 
   const repayAmountParsed = repayAmt
-    ? (() => { try { return parseUnits(repayAmt, 18); } catch { return 0n; } })()
+    ? (() => {
+        try {
+          return parseUnits(repayAmt, 18);
+        } catch {
+          return 0n;
+        }
+      })()
     : 0n;
   const needsApproval = repayAmountParsed > 0n && allowance < repayAmountParsed;
 
@@ -439,11 +488,15 @@ function ActiveLoanCard({
   }
 
   return (
-    <Card className={`border-white/[0.06] bg-white/[0.04] ${isOverdue ? "!border-red-800/60" : ""}`}>
+    <Card
+      className={`border-white/[0.06] bg-white/[0.04] ${isOverdue ? "!border-red-800/60" : ""}`}
+    >
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-white">
-            <Clock className={`h-5 w-5 ${isOverdue ? "text-red-400" : "text-blue-400"}`} />
+            <Clock
+              className={`h-5 w-5 ${isOverdue ? "text-red-400" : "text-blue-400"}`}
+            />
             Active Loan #{loanId.toString()}
           </CardTitle>
           <Badge
@@ -480,7 +533,9 @@ function ActiveLoanCard({
           </div>
           <div>
             <p className="text-xs text-zinc-500">Rate (BPS)</p>
-            <p className="font-semibold text-white">{interestRateBps.toString()}</p>
+            <p className="font-semibold text-white">
+              {interestRateBps.toString()}
+            </p>
           </div>
         </div>
 
@@ -489,7 +544,10 @@ function ActiveLoanCard({
             <span>Due {dueDate.toLocaleDateString()}</span>
             <span>Next auto-repayment: on next reward claim from cc3</span>
           </div>
-          <Progress value={pctRepaid} className="h-2 bg-white/10 [&>div]:bg-sky-500" />
+          <Progress
+            value={pctRepaid}
+            className="h-2 bg-white/10 [&>div]:bg-sky-500"
+          />
         </div>
 
         <Separator className="bg-white/[0.06]" />
@@ -501,7 +559,9 @@ function ActiveLoanCard({
               type="number"
               placeholder="Amount in WCTC"
               value={repayAmt}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRepayAmt(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setRepayAmt(e.target.value)
+              }
               className="border-white/[0.10] bg-white/[0.05] text-white placeholder:text-zinc-500"
               min="0"
               step="0.0001"
@@ -531,13 +591,25 @@ function ActiveLoanCard({
           <div className="flex flex-wrap gap-2">
             {approveHash && (
               <TxStatusBadge
-                status={approveConfirming ? "pending" : approveConfirmed ? "confirmed" : "pending"}
+                status={
+                  approveConfirming
+                    ? "pending"
+                    : approveConfirmed
+                      ? "confirmed"
+                      : "pending"
+                }
                 txHash={approveHash}
               />
             )}
             {repayHash && (
               <TxStatusBadge
-                status={repayConfirming ? "pending" : repayConfirmed ? "confirmed" : "pending"}
+                status={
+                  repayConfirming
+                    ? "pending"
+                    : repayConfirmed
+                      ? "confirmed"
+                      : "pending"
+                }
                 txHash={repayHash}
               />
             )}
@@ -565,16 +637,15 @@ function LoanApplicationForm({
   const [escrowBps, setEscrowBps] = useState(3000); // 30%
 
   const requestedAmount =
-    maxLoanAmount > 0n
-      ? (maxLoanAmount * BigInt(requestedPct)) / 100n
-      : 0n;
+    maxLoanAmount > 0n ? (maxLoanAmount * BigInt(requestedPct)) / 100n : 0n;
 
   const { data: allowanceData } = useReadContract({
     ...wctcContract,
     functionName: "allowance",
-    args: address && HARDWARE_YIELD_CORE_ADDRESS
-      ? [address, HARDWARE_YIELD_CORE_ADDRESS]
-      : undefined,
+    args:
+      address && HARDWARE_YIELD_CORE_ADDRESS
+        ? [address, HARDWARE_YIELD_CORE_ADDRESS]
+        : undefined,
     query: { enabled: !!address },
   });
   const allowance = (allowanceData ?? 0n) as bigint;
@@ -588,8 +659,13 @@ function LoanApplicationForm({
     useWaitForTransactionReceipt({ hash: applyHash });
 
   useEffect(() => {
-    if (applyConfirmed) { toast.success("Loan created!"); onApplied(); }
-    if (approveConfirmed) { toast.success("Approval confirmed!"); }
+    if (applyConfirmed) {
+      toast.success("Loan created!");
+      onApplied();
+    }
+    if (approveConfirmed) {
+      toast.success("Approval confirmed!");
+    }
   }, [applyConfirmed, approveConfirmed, onApplied]);
 
   const needsApproval = requestedAmount > 0n && allowance < requestedAmount;
@@ -648,7 +724,8 @@ function LoanApplicationForm({
           <div className="flex items-center justify-between text-sm">
             <span className="text-zinc-400">Requested Amount</span>
             <span className="font-medium text-white">
-              {parseFloat(formatUnits(requestedAmount, 18)).toFixed(4)} CTC ({requestedPct}%)
+              {parseFloat(formatUnits(requestedAmount, 18)).toFixed(4)} CTC (
+              {requestedPct}%)
             </span>
           </div>
           <Slider
@@ -669,7 +746,8 @@ function LoanApplicationForm({
           <div className="flex items-center justify-between text-sm">
             <span className="text-zinc-400">Escrow Rate</span>
             <span className="font-medium text-white">
-              {(escrowBps / 100).toFixed(0)}% of each future reward auto-repays loan
+              {(escrowBps / 100).toFixed(0)}% of each future reward auto-repays
+              loan
             </span>
           </div>
           <Slider
@@ -703,7 +781,9 @@ function LoanApplicationForm({
 
         <Button
           onClick={handleApply}
-          disabled={requestedAmount === 0n || applyConfirming || approveConfirming}
+          disabled={
+            requestedAmount === 0n || applyConfirming || approveConfirming
+          }
           className="w-full bg-blue-600 hover:bg-blue-500 text-white disabled:opacity-50"
         >
           {approveConfirming
@@ -718,13 +798,25 @@ function LoanApplicationForm({
         <div className="flex flex-wrap gap-2">
           {approveHash && (
             <TxStatusBadge
-              status={approveConfirming ? "pending" : approveConfirmed ? "confirmed" : "pending"}
+              status={
+                approveConfirming
+                  ? "pending"
+                  : approveConfirmed
+                    ? "confirmed"
+                    : "pending"
+              }
               txHash={approveHash}
             />
           )}
           {applyHash && (
             <TxStatusBadge
-              status={applyConfirming ? "pending" : applyConfirmed ? "confirmed" : "pending"}
+              status={
+                applyConfirming
+                  ? "pending"
+                  : applyConfirmed
+                    ? "confirmed"
+                    : "pending"
+              }
               txHash={applyHash}
             />
           )}
@@ -743,31 +835,71 @@ function SimulateRewardButton({
   onDone: () => void;
 }) {
   const chainId = useChainId();
-  const { switchChain } = useSwitchChain();
-  const { writeContract, data: hash } = useWriteContract();
+  const { switchChain, isPending: isSwitching } = useSwitchChain();
+  const {
+    writeContract,
+    data: hash,
+    isPending: isWritePending,
+    error: writeError,
+  } = useWriteContract();
   const { isLoading: confirming, isSuccess: confirmed } =
-    useWaitForTransactionReceipt({ hash });
+    useWaitForTransactionReceipt({
+      hash,
+      chainId: creditcoinTestnet.id, // Always check on cc3, not current chain
+    });
 
+  // pendingWrite: user clicked but we had to switch chain first — fire tx once we land on cc3
+  const [pendingWrite, setPendingWrite] = useState(false);
+
+  // Once chain switch completes and we land on cc3, fire the write
+  useEffect(() => {
+    if (pendingWrite && chainId === creditcoinTestnet.id) {
+      setPendingWrite(false);
+      writeContract({
+        ...spaceRewardEmitterContract,
+        functionName: "claimReward",
+        args: [parseUnits("50", 18)],
+      });
+    }
+  }, [chainId, pendingWrite, writeContract]);
+
+  // After confirm, switch back to USC Testnet v2 and refresh data
   useEffect(() => {
     if (confirmed) {
-      toast.success("Reward claimed on cc3 — oracle worker will pick this up within ~30 seconds.");
+      toast.success(
+        "Reward claimed on cc3 — oracle worker will pick this up within ~30 seconds.",
+      );
       onDone();
-      // Switch back to USC Testnet v2
       switchChain({ chainId: USC_TESTNET_ID });
     }
   }, [confirmed, onDone, switchChain]);
 
-  async function handleSimulate() {
-    if (chainId !== creditcoinTestnet.id) {
-      switchChain({ chainId: creditcoinTestnet.id });
-      toast.info("Switched to cc3. Click again to claim reward.");
-      return;
+  useEffect(() => {
+    if (writeError) {
+      toast.error(`tx failed: ${writeError.message.split("\n")[0]}`);
     }
-    writeContract({
-      ...spaceRewardEmitterContract,
-      functionName: "claimReward",
-      args: [parseUnits("50", 18)],
-    });
+  }, [writeError]);
+
+  function handleSimulate() {
+    if (chainId !== creditcoinTestnet.id) {
+      setPendingWrite(true);
+      switchChain({ chainId: creditcoinTestnet.id });
+    } else {
+      writeContract({
+        ...spaceRewardEmitterContract,
+        functionName: "claimReward",
+        args: [parseUnits("50", 18)],
+      });
+    }
+  }
+
+  const busy = isSwitching || pendingWrite || isWritePending || confirming;
+
+  function buttonLabel() {
+    if (isSwitching || pendingWrite) return "Switching to cc3…";
+    if (isWritePending) return "Confirm in MetaMask…";
+    if (confirming) return "Confirming on cc3…";
+    return "Claim 50 CTC Reward";
   }
 
   return (
@@ -778,33 +910,28 @@ function SimulateRewardButton({
           Dev Tool — Simulate Reward Claim
         </CardTitle>
         <CardDescription className="text-zinc-500 text-xs">
-          Calls SpaceRewardEmitter.claimReward(50 CTC) on cc3. Requires network
-          switch. Oracle picks it up in ~30s.
+          Calls SpaceRewardEmitter.claimReward(50 CTC) on cc3. Auto-switches
+          network. MIN_CLAIM_INTERVAL = 50 blocks (~10 min).
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-3">
         <Button
           onClick={handleSimulate}
-          disabled={confirming}
+          disabled={busy}
           variant="outline"
           className="border-amber-700 text-amber-400 hover:bg-amber-950/50 disabled:opacity-50"
         >
-          {confirming
-            ? "Claiming on cc3…"
-            : chainId !== creditcoinTestnet.id
-              ? "Switch to cc3 & Claim"
-              : "Claim 50 CTC Reward"}
+          {buttonLabel()}
         </Button>
         {hash && (
-          <div className="mt-3">
-            <TxStatusBadge
-              status={confirming ? "pending" : confirmed ? "confirmed" : "pending"}
-              txHash={hash}
-            />
-          </div>
+          <TxStatusBadge
+            status={
+              confirming ? "pending" : confirmed ? "confirmed" : "pending"
+            }
+            txHash={hash}
+          />
         )}
       </CardContent>
     </Card>
   );
 }
-
