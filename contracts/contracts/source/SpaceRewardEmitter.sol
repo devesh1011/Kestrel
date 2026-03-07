@@ -16,7 +16,8 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 contract SpaceRewardEmitter is Ownable {
     // ─── Constants ────────────────────────────────────────────────────────────
     /// @notice Minimum blocks between consecutive claims from the same wallet.
-    uint256 public constant MIN_CLAIM_INTERVAL = 50;
+    /// @dev Set to 0 for demo purposes to allow frequent testing.
+    uint256 public constant MIN_CLAIM_INTERVAL = 0;
 
     // ─── State ────────────────────────────────────────────────────────────────
     /// @notice Lifetime earnings per node wallet.
