@@ -86,6 +86,9 @@ const LOAN_STATUS: Record<number, string> = {
 function BorrowContent() {
   const { address } = useAccount();
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   // ── Step 1: Get active loan id & credit score ──────────────────────────
   const {
     data: activeLoanIdRaw,
@@ -187,13 +190,13 @@ function BorrowContent() {
 
   return (
     <div className="space-y-6">
-      {!address && (
+      {(!mounted || !address) && (
         <div className="rounded-[20px] border border-white/[0.06] bg-white/[0.04] px-6 py-10 text-center text-zinc-400">
           Connect your wallet to view your borrower profile.
         </div>
       )}
 
-      {address && (
+      {mounted && address && (
         <>
           {/* Credit Score Card */}
           <CreditScoreCard

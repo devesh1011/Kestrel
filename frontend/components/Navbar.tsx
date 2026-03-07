@@ -45,7 +45,7 @@ export function Navbar() {
           className="flex items-center gap-2 font-semibold text-white"
         >
           <Cpu className="h-5 w-5 text-emerald-400" />
-          <span className="text-lg tracking-tight">HardwareYield</span>
+          <span className="text-lg tracking-tight">Kestrel</span>
         </Link>
 
         {/* Nav links */}

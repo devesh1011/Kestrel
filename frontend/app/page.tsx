@@ -2,6 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { DotGlobeHero } from "@/components/ui/globe-hero";
 import { ArrowRight, Zap } from "lucide-react";
 import { FeaturesSectionWithHoverEffects } from "@/components/blocks/feature-section-with-hover-effects";
@@ -98,28 +99,30 @@ export default function DotGlobeHeroDemo() {
             transition={{ duration: 0.8, delay: 1 }}
             className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-4"
           >
-            <motion.button
-              whileHover={{
-                scale: 1.05,
-                boxShadow:
-                  "0 20px 40px rgba(0,0,0,0.2), 0 0 25px hsl(var(--primary) / 0.3)",
-                y: -2,
-              }}
-              whileTap={{ scale: 0.98 }}
-              className="group relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-primary via-primary to-primary/90 text-primary-foreground rounded-xl font-semibold text-lg shadow-xl hover:shadow-primary/30 transition-all duration-500 overflow-hidden border border-primary/20"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-white/20 via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-                initial={{ x: "-100%" }}
-                whileHover={{ x: "100%" }}
-                transition={{ duration: 0.8 }}
-              />
-              <span className="relative z-10 tracking-wide">Start Lending</span>
-              <ArrowRight className="relative z-10 w-5 h-5 group-hover:translate-x-2 transition-transform duration-300" />
-            </motion.button>
+            <Link href="/dashboard">
+              <motion.button
+                whileHover={{
+                  scale: 1.05,
+                  boxShadow:
+                    "0 20px 40px rgba(0,0,0,0.2), 0 0 25px hsl(var(--primary) / 0.3)",
+                  y: -2,
+                }}
+                whileTap={{ scale: 0.98 }}
+                className="group relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-primary via-primary to-primary/90 text-primary-foreground rounded-xl font-semibold text-lg shadow-xl hover:shadow-primary/30 transition-all duration-500 overflow-hidden border border-primary/20"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-white/20 via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                  initial={{ x: "-100%" }}
+                  whileHover={{ x: "100%" }}
+                  transition={{ duration: 0.8 }}
+                />
+                <span className="relative z-10 tracking-wide">Launch App</span>
+                <ArrowRight className="relative z-10 w-5 h-5 group-hover:translate-x-2 transition-transform duration-300" />
+              </motion.button>
+            </Link>
 
-            <motion.button
+            {/* <motion.button
               whileHover={{
                 scale: 1.05,
                 backgroundColor: "hsl(var(--accent))",
@@ -134,7 +137,7 @@ export default function DotGlobeHeroDemo() {
               <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <Zap className="relative z-10 w-5 h-5 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300" />
               <span className="relative z-10 tracking-wide">Borrow CTC</span>
-            </motion.button>
+            </motion.button> */}
           </motion.div>
         </div>
       </DotGlobeHero>
@@ -146,7 +149,7 @@ export default function DotGlobeHeroDemo() {
         socialLinks={[
           {
             icon: <Twitter className="h-5 w-5" />,
-            href: "https://x.com/kestrel_fianance",
+            href: "https://x.com/kestrel_finance",
             label: "Twitter",
           },
           {

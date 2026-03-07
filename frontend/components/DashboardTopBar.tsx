@@ -6,8 +6,8 @@ import {
   RotateCcw,
   Bell,
   LayoutGrid,
-  ChevronDown,
 } from "lucide-react";
+import { ConnectWalletButton } from "@/components/ConnectWalletButton";
 
 export function DashboardTopBar() {
   return (
@@ -21,7 +21,7 @@ export function DashboardTopBar() {
 
       {/* Right controls */}
       <div className="flex items-center gap-3">
-        <div className="flex h-8 w-48 items-center gap-2 rounded-lg bg-white/[0.05] px-3">
+        <div className="hidden md:flex h-8 w-48 items-center gap-2 rounded-lg bg-white/[0.05] px-3">
           <Search className="h-3.5 w-3.5 text-zinc-500" />
           <input
             placeholder="Search"
@@ -41,6 +41,7 @@ export function DashboardTopBar() {
         <button className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:bg-white/[0.05]">
           <LayoutGrid className="h-4 w-4" />
         </button>
+        <ConnectWalletButton />
       </div>
     </header>
   );

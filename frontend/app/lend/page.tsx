@@ -80,6 +80,9 @@ function LendContent() {
   const { address } = useAccount();
   const publicClient = usePublicClient({ chainId: creditcoinUSC.id });
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   const [depositAmt, setDepositAmt] = useState("");
   const [withdrawAmt, setWithdrawAmt] = useState("");
   const [yieldHistory, setYieldHistory] = useState<YieldDay[]>([]);
@@ -278,7 +281,9 @@ function LendContent() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {!address ? (
+            {!mounted ? (
+              <Skeleton className="h-7 w-28 bg-white/10" />
+            ) : !address ? (
               <p className="text-sm text-zinc-500">Connect wallet</p>
             ) : isLoading ? (
               <Skeleton className="h-7 w-28 bg-white/10" />

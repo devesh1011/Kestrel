@@ -1,8 +1,8 @@
-# Figma Design Specification — HardwareYield Dashboard
+# Figma Design Specification — Kestrel Dashboard
 
 > Figma file key: `NG18MHF02rQYRxql9qG084`  
 > Template base: SnowUI Dashboard  
-> Primary frame: node `54869:11584` — Desktop 1440 × 1024  
+> Primary frame: node `54869:11584` — Desktop 1440 × 1024
 
 ---
 
@@ -12,36 +12,36 @@
 
 ```css
 /* Backgrounds */
---bg-canvas:          #0f0f0f;      /* outermost canvas (dark) */
---bg-sidebar:         #171821;      /* left sidebar */
---bg-main:            #171821;      /* main content area */
---bg-card-blue:       #e6f1fd;      /* stat card blue tint */
---bg-card-purple:     #edeefc;      /* stat card purple tint */
---bg-chart-block:     rgba(255,255,255,0.04); /* chart container */
---bg-right-panel:     #ffffff;      /* right panel — WHITE */
+--bg-canvas: #0f0f0f; /* outermost canvas (dark) */
+--bg-sidebar: #171821; /* left sidebar */
+--bg-main: #171821; /* main content area */
+--bg-card-blue: #e6f1fd; /* stat card blue tint */
+--bg-card-purple: #edeefc; /* stat card purple tint */
+--bg-chart-block: rgba(255, 255, 255, 0.04); /* chart container */
+--bg-right-panel: #ffffff; /* right panel — WHITE */
 
 /* Text */
---text-white:         #ffffff;
---text-black:         #000000;      /* used on light cards */
---text-muted-40:      rgba(255,255,255,0.40);
---text-muted-15:      rgba(255,255,255,0.15);
+--text-white: #ffffff;
+--text-black: #000000; /* used on light cards */
+--text-muted-40: rgba(255, 255, 255, 0.4);
+--text-muted-15: rgba(255, 255, 255, 0.15);
 
 /* Accent palette (chart bars) */
---bar-blue:           #a0bce8;
---bar-mint:           #6be6d3;
---bar-sky:            #7dbbff;
---bar-purple:         #b899eb;
---bar-green:          #71dd8c;
---bar-primary:        #000000;      /* iOS bar (solid dark) */
+--bar-blue: #a0bce8;
+--bar-mint: #6be6d3;
+--bar-sky: #7dbbff;
+--bar-purple: #b899eb;
+--bar-green: #71dd8c;
+--bar-primary: #000000; /* iOS bar (solid dark) */
 
 /* Lines / borders */
---border-divider:     rgba(255,255,255,0.06);
---border-right-panel: rgba(0,0,0,0.10);
---border-activity:    rgba(0,0,0,0.10);   /* dashed activity line */
+--border-divider: rgba(255, 255, 255, 0.06);
+--border-right-panel: rgba(0, 0, 0, 0.1);
+--border-activity: rgba(0, 0, 0, 0.1); /* dashed activity line */
 
 /* Icon badge backgrounds */
---icon-bg-purple:     #edeefc;
---icon-bg-blue:       #e6f1fd;
+--icon-bg-purple: #edeefc;
+--icon-bg-blue: #e6f1fd;
 ```
 
 ### Typography
@@ -93,14 +93,12 @@ font-feature-settings: 'ss01' 1, 'cv01' 1;
 ```tsx
 // app/dashboard/layout.tsx (target)
 <div className="flex h-screen overflow-hidden bg-[#171821]">
-  <DashboardSidebar />           {/* 220px, shrink-0 */}
+  <DashboardSidebar /> {/* 220px, shrink-0 */}
   <div className="flex flex-1 flex-col overflow-hidden">
-    <DashboardTopBar />           {/* h-14 */}
-    <main className="flex-1 overflow-y-auto p-6">
-      {children}
-    </main>
+    <DashboardTopBar /> {/* h-14 */}
+    <main className="flex-1 overflow-y-auto p-6">{children}</main>
   </div>
-  <DashboardRightPanel />        {/* hidden on < xl, 280px */}
+  <DashboardRightPanel /> {/* hidden on < xl, 280px */}
 </div>
 ```
 
@@ -126,7 +124,10 @@ font-feature-settings: 'ss01' 1, 'cv01' 1;
   <div className="flex items-center gap-3">
     <div className="flex h-8 w-48 items-center gap-2 rounded-lg bg-white/[0.05] px-3">
       <Search className="h-3.5 w-3.5 text-zinc-500" />
-      <input placeholder="Search" className="bg-transparent text-[12px] text-zinc-400 outline-none placeholder:text-zinc-600 w-full" />
+      <input
+        placeholder="Search"
+        className="bg-transparent text-[12px] text-zinc-400 outline-none placeholder:text-zinc-600 w-full"
+      />
     </div>
     <button className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:bg-white/[0.05]">
       <Sun className="h-4 w-4" />
@@ -179,15 +180,18 @@ font-feature-settings: 'ss01' 1, 'cv01' 1;
 ```
 
 Active nav item:
+
 ```tsx
-className="bg-white/10 text-white rounded-lg px-2.5 py-2"
+className = "bg-white/10 text-white rounded-lg px-2.5 py-2";
 // icon: text-emerald-400
 // trailing: <ChevronRight className="ml-auto h-3.5 w-3.5 text-zinc-500" />
 ```
 
 Inactive nav item:
+
 ```tsx
-className="text-zinc-400 hover:bg-white/5 hover:text-white rounded-lg px-2.5 py-2"
+className =
+  "text-zinc-400 hover:bg-white/5 hover:text-white rounded-lg px-2.5 py-2";
 // icon: text-zinc-500
 ```
 
@@ -223,29 +227,37 @@ Alternating colors: card 1,3 = blue tint; card 2,4 = purple tint.
 interface StatCardProps {
   label: string;
   value: string;
-  delta: string;       // e.g. "+8%"
+  delta: string; // e.g. "+8%"
   deltaUp?: boolean;
-  variant?: "blue" | "purple";  // controls bg color
+  variant?: "blue" | "purple"; // controls bg color
 }
 
-<div className={cn(
-  "rounded-[20px] p-6 flex flex-col gap-3",
-  variant === "blue"   ? "bg-[#e6f1fd]" : "bg-[#edeefc]"
-)}>
+<div
+  className={cn(
+    "rounded-[20px] p-6 flex flex-col gap-3",
+    variant === "blue" ? "bg-[#e6f1fd]" : "bg-[#edeefc]",
+  )}
+>
   <p className="text-[14px] font-normal text-black/70">{label}</p>
   <div className="flex items-end justify-between">
     <span className="text-[24px] font-semibold leading-8 text-black">
       {value}
     </span>
-    <span className={cn(
-      "flex items-center gap-0.5 text-[12px] font-medium",
-      deltaUp ? "text-emerald-600" : "text-red-500"
-    )}>
-      {deltaUp ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
+    <span
+      className={cn(
+        "flex items-center gap-0.5 text-[12px] font-medium",
+        deltaUp ? "text-emerald-600" : "text-red-500",
+      )}
+    >
+      {deltaUp ? (
+        <ArrowUp className="h-3 w-3" />
+      ) : (
+        <ArrowDown className="h-3 w-3" />
+      )}
       {delta}
     </span>
   </div>
-</div>
+</div>;
 ```
 
 ---
@@ -270,11 +282,43 @@ Two-line area chart: **"This Period"** (solid line, `#7dbbff`) + **"Last Period"
 <ResponsiveContainer width="100%" height={200}>
   <LineChart data={data}>
     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-    <XAxis dataKey="date" tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 11 }} axisLine={false} tickLine={false} />
-    <YAxis tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v/1000}K`} />
-    <Tooltip contentStyle={{ background: "#1e2028", border: "none", borderRadius: 8, fontSize: 12 }} />
-    <Line type="monotone" dataKey="thisMonth" name="This Period" stroke="#7dbbff" strokeWidth={2} dot={false} />
-    <Line type="monotone" dataKey="lastMonth" name="Last Period" stroke="rgba(125,187,255,0.35)" strokeWidth={2} strokeDasharray="4 4" dot={false} />
+    <XAxis
+      dataKey="date"
+      tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 11 }}
+      axisLine={false}
+      tickLine={false}
+    />
+    <YAxis
+      tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 11 }}
+      axisLine={false}
+      tickLine={false}
+      tickFormatter={(v) => `${v / 1000}K`}
+    />
+    <Tooltip
+      contentStyle={{
+        background: "#1e2028",
+        border: "none",
+        borderRadius: 8,
+        fontSize: 12,
+      }}
+    />
+    <Line
+      type="monotone"
+      dataKey="thisMonth"
+      name="This Period"
+      stroke="#7dbbff"
+      strokeWidth={2}
+      dot={false}
+    />
+    <Line
+      type="monotone"
+      dataKey="lastMonth"
+      name="Last Period"
+      stroke="rgba(125,187,255,0.35)"
+      strokeWidth={2}
+      strokeDasharray="4 4"
+      dot={false}
+    />
   </LineChart>
 </ResponsiveContainer>
 ```
@@ -285,22 +329,27 @@ Horizontal pill multi-segment bars for top sites. Each row: label + segmented pi
 
 ```tsx
 const sites = [
-  { name: "Google",    value: 72, color: "#7dbbff" },
-  { name: "YouTube",   value: 55, color: "#b899eb" },
+  { name: "Google", value: 72, color: "#7dbbff" },
+  { name: "YouTube", value: 55, color: "#b899eb" },
   { name: "Instagram", value: 48, color: "#6be6d3" },
   { name: "Pinterest", value: 32, color: "#71dd8c" },
-  { name: "Facebook",  value: 28, color: "#a0bce8" },
-  { name: "Twitter",   value: 20, color: "#7dbbff" },
+  { name: "Facebook", value: 28, color: "#a0bce8" },
+  { name: "Twitter", value: 20, color: "#7dbbff" },
 ];
 
 // Each row:
 <div className="flex items-center gap-3">
   <span className="w-20 text-[12px] text-zinc-400">{site.name}</span>
   <div className="flex h-2 flex-1 overflow-hidden rounded-full bg-white/10">
-    <div style={{ width: `${site.value}%`, background: site.color }} className="h-full rounded-full" />
+    <div
+      style={{ width: `${site.value}%`, background: site.color }}
+      className="h-full rounded-full"
+    />
   </div>
-  <span className="w-7 text-right text-[12px] text-zinc-400">{site.value}%</span>
-</div>
+  <span className="w-7 text-right text-[12px] text-zinc-400">
+    {site.value}%
+  </span>
+</div>;
 ```
 
 ### 6c. Capital Allocation Chart (donut, ~400px)
@@ -310,10 +359,10 @@ Keep existing donut but update colors and add text legend below:
 ```tsx
 // Legend below the donut
 const segments = [
-  { label: "Loaned",    pct: "52.1%", color: "#7dbbff" },
+  { label: "Loaned", pct: "52.1%", color: "#7dbbff" },
   { label: "Available", pct: "22.8%", color: "#6be6d3" },
-  { label: "Reserved",  pct: "13.9%", color: "#b899eb" },
-  { label: "Other",     pct: "11.2%", color: "#71dd8c" },
+  { label: "Reserved", pct: "13.9%", color: "#b899eb" },
+  { label: "Other", pct: "11.2%", color: "#71dd8c" },
 ];
 
 // Legend row:
@@ -321,7 +370,7 @@ const segments = [
   <div style={{ background: seg.color }} className="h-2.5 w-2.5 rounded-sm" />
   <span className="text-[12px] text-zinc-300">{seg.label}</span>
   <span className="ml-auto text-[12px] font-medium text-white">{seg.pct}</span>
-</div>
+</div>;
 ```
 
 Donut cell colors: `["#7dbbff", "#6be6d3", "#b899eb", "#71dd8c"]`
@@ -331,25 +380,47 @@ Donut cell colors: `["#7dbbff", "#6be6d3", "#b899eb", "#71dd8c"]`
 ```tsx
 // NEW: components/charts/TrafficByDeviceChart.tsx
 const devices = [
-  { name: "Linux",   value: 6200, fill: "#a0bce8" },
-  { name: "Mac",     value: 5100, fill: "#6be6d3" },
-  { name: "iOS",     value: 4800, fill: "#000000" },
+  { name: "Linux", value: 6200, fill: "#a0bce8" },
+  { name: "Mac", value: 5100, fill: "#6be6d3" },
+  { name: "iOS", value: 4800, fill: "#000000" },
   { name: "Windows", value: 7400, fill: "#7dbbff" },
   { name: "Android", value: 3200, fill: "#b899eb" },
-  { name: "Other",   value: 1800, fill: "#71dd8c" },
+  { name: "Other", value: 1800, fill: "#71dd8c" },
 ];
 
 <ResponsiveContainer width="100%" height={200}>
   <BarChart data={devices} barSize={24}>
-    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
-    <XAxis dataKey="name" tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 11 }} axisLine={false} tickLine={false} />
-    <YAxis tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 11 }} axisLine={false} tickLine={false} />
-    <Tooltip contentStyle={{ background: "#1e2028", border: "none", borderRadius: 8, fontSize: 12 }} />
+    <CartesianGrid
+      strokeDasharray="3 3"
+      stroke="rgba(255,255,255,0.06)"
+      vertical={false}
+    />
+    <XAxis
+      dataKey="name"
+      tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 11 }}
+      axisLine={false}
+      tickLine={false}
+    />
+    <YAxis
+      tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 11 }}
+      axisLine={false}
+      tickLine={false}
+    />
+    <Tooltip
+      contentStyle={{
+        background: "#1e2028",
+        border: "none",
+        borderRadius: 8,
+        fontSize: 12,
+      }}
+    />
     <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-      {devices.map((d) => <Cell key={d.name} fill={d.fill} />)}
+      {devices.map((d) => (
+        <Cell key={d.name} fill={d.fill} />
+      ))}
     </Bar>
   </BarChart>
-</ResponsiveContainer>
+</ResponsiveContainer>;
 ```
 
 ---
@@ -389,17 +460,18 @@ const devices = [
 ```tsx
 // components/DashboardRightPanel.tsx (target)
 <aside className="hidden xl:flex h-screen w-[280px] shrink-0 flex-col overflow-y-auto border-l border-black/10 bg-white">
-
   {/* Notifications */}
   <div className="p-5 border-b border-black/[0.06]">
     <h3 className="mb-3 text-[14px] font-semibold text-black">Notifications</h3>
     <div className="space-y-3">
       {notifications.map((n) => (
         <div key={n.id} className="flex items-start gap-3">
-          <div className={cn(
-            "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg",
-            n.variant === "purple" ? "bg-[#edeefc]" : "bg-[#e6f1fd]"
-          )}>
+          <div
+            className={cn(
+              "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg",
+              n.variant === "purple" ? "bg-[#edeefc]" : "bg-[#e6f1fd]",
+            )}
+          >
             <n.Icon className="h-4 w-4 text-black/60" />
           </div>
           <div className="flex-1 min-w-0">
@@ -420,7 +492,13 @@ const devices = [
       {activities.map((a) => (
         <div key={a.id} className="relative flex items-start gap-3 pl-8">
           <div className="absolute left-0 h-6 w-6 overflow-hidden rounded-full bg-zinc-200 shrink-0">
-            <Image src={a.avatar} alt={a.name} width={24} height={24} className="object-cover" />
+            <Image
+              src={a.avatar}
+              alt={a.name}
+              width={24}
+              height={24}
+              className="object-cover"
+            />
           </div>
           <div>
             <p className="text-[13px] text-black leading-5">{a.action}</p>
@@ -438,14 +516,19 @@ const devices = [
       {contacts.map((c) => (
         <div key={c.name} className="flex items-center gap-3">
           <div className="h-7 w-7 overflow-hidden rounded-full bg-zinc-200 shrink-0">
-            <Image src={c.avatar} alt={c.name} width={28} height={28} className="object-cover" />
+            <Image
+              src={c.avatar}
+              alt={c.name}
+              width={28}
+              height={28}
+              className="object-cover"
+            />
           </div>
           <span className="text-[13px] text-black">{c.name}</span>
         </div>
       ))}
     </div>
   </div>
-
 </aside>
 ```
 
@@ -453,27 +536,81 @@ Data constants for right panel:
 
 ```tsx
 const notifications = [
-  { id: 1, text: "You fixed a bug.",             time: "Just now",   variant: "purple", Icon: Bug        },
-  { id: 2, text: "New user registered.",          time: "59 min ago", variant: "blue",   Icon: UserPlus   },
-  { id: 3, text: "Andi Lane subscribed.",         time: "Today",      variant: "purple", Icon: Bell       },
-  { id: 4, text: "New message received.",         time: "5 hrs ago",  variant: "blue",   Icon: MessageCircle },
+  {
+    id: 1,
+    text: "You fixed a bug.",
+    time: "Just now",
+    variant: "purple",
+    Icon: Bug,
+  },
+  {
+    id: 2,
+    text: "New user registered.",
+    time: "59 min ago",
+    variant: "blue",
+    Icon: UserPlus,
+  },
+  {
+    id: 3,
+    text: "Andi Lane subscribed.",
+    time: "Today",
+    variant: "purple",
+    Icon: Bell,
+  },
+  {
+    id: 4,
+    text: "New message received.",
+    time: "5 hrs ago",
+    variant: "blue",
+    Icon: MessageCircle,
+  },
 ];
 
 const activities = [
-  { id: 1, name: "Brooklyn Simmons", avatar: "/avatars/1.jpg", action: "Changed the style.",       time: "Just now"  },
-  { id: 2, name: "Esther Howard",    avatar: "/avatars/2.jpg", action: "Released a new version.",  time: "59 min ago" },
-  { id: 3, name: "Cameron Williamson", avatar: "/avatars/3.jpg", action: "Submitted a bug.",      time: "12 hrs ago" },
-  { id: 4, name: "Kristin Watson",   avatar: "/avatars/4.jpg", action: "Modified A to Z data.",   time: "Today"     },
-  { id: 5, name: "Ronald Richards",  avatar: "/avatars/5.jpg", action: "Deleted a page.",         time: "Feb 2025"  },
+  {
+    id: 1,
+    name: "Brooklyn Simmons",
+    avatar: "/avatars/1.jpg",
+    action: "Changed the style.",
+    time: "Just now",
+  },
+  {
+    id: 2,
+    name: "Esther Howard",
+    avatar: "/avatars/2.jpg",
+    action: "Released a new version.",
+    time: "59 min ago",
+  },
+  {
+    id: 3,
+    name: "Cameron Williamson",
+    avatar: "/avatars/3.jpg",
+    action: "Submitted a bug.",
+    time: "12 hrs ago",
+  },
+  {
+    id: 4,
+    name: "Kristin Watson",
+    avatar: "/avatars/4.jpg",
+    action: "Modified A to Z data.",
+    time: "Today",
+  },
+  {
+    id: 5,
+    name: "Ronald Richards",
+    avatar: "/avatars/5.jpg",
+    action: "Deleted a page.",
+    time: "Feb 2025",
+  },
 ];
 
 const contacts = [
-  { name: "Natali Craig",   avatar: "/avatars/contact1.jpg" },
-  { name: "Drew Cano",      avatar: "/avatars/contact2.jpg" },
-  { name: "Andi Lane",      avatar: "/avatars/contact3.jpg" },
-  { name: "Koray Okumus",   avatar: "/avatars/contact4.jpg" },
-  { name: "Kate Morrison",  avatar: "/avatars/contact5.jpg" },
-  { name: "Melody Macy",    avatar: "/avatars/contact6.jpg" },
+  { name: "Natali Craig", avatar: "/avatars/contact1.jpg" },
+  { name: "Drew Cano", avatar: "/avatars/contact2.jpg" },
+  { name: "Andi Lane", avatar: "/avatars/contact3.jpg" },
+  { name: "Koray Okumus", avatar: "/avatars/contact4.jpg" },
+  { name: "Kate Morrison", avatar: "/avatars/contact5.jpg" },
+  { name: "Melody Macy", avatar: "/avatars/contact6.jpg" },
 ];
 ```
 
@@ -508,16 +645,40 @@ export default function OverviewPage() {
 
       {/* Row 1: Stat cards */}
       <div className="grid grid-cols-2 gap-7 lg:grid-cols-4">
-        <StatCard label="Total Deposits" value="14,230 CTC" delta="+8%" deltaUp variant="blue" />
-        <StatCard label="Active Loans"   value="9"          delta="+2%" deltaUp variant="purple" />
-        <StatCard label="Total Borrowed" value="8,741 CTC"  delta="-1%" deltaUp={false} variant="blue" />
-        <StatCard label="Avg. APR"       value="12.4%"      delta="0%"  deltaUp variant="purple" />
+        <StatCard
+          label="Total Deposits"
+          value="14,230 CTC"
+          delta="+8%"
+          deltaUp
+          variant="blue"
+        />
+        <StatCard
+          label="Active Loans"
+          value="9"
+          delta="+2%"
+          deltaUp
+          variant="purple"
+        />
+        <StatCard
+          label="Total Borrowed"
+          value="8,741 CTC"
+          delta="-1%"
+          deltaUp={false}
+          variant="blue"
+        />
+        <StatCard
+          label="Avg. APR"
+          value="12.4%"
+          delta="0%"
+          deltaUp
+          variant="purple"
+        />
       </div>
 
       {/* Row 2: Main chart + website traffic */}
       <div className="grid grid-cols-[1fr_auto] gap-5">
-        <RewardHistoryChart />              {/* ~662px, flex-1 */}
-        <TrafficByWebsiteChart />           {/* 272px fixed */}
+        <RewardHistoryChart /> {/* ~662px, flex-1 */}
+        <TrafficByWebsiteChart /> {/* 272px fixed */}
       </div>
 
       {/* Row 3: Device chart + donut */}
@@ -534,18 +695,18 @@ export default function OverviewPage() {
 
 ## 10. What Needs to Change — File-by-File Diff
 
-| File | Current | Target |
-|------|---------|--------|
-| `app/dashboard/layout.tsx` | No top bar | Add `<DashboardTopBar />` |
-| `app/dashboard/page.tsx` | Dark stat cards, live contract reads, 2 charts | Light stat cards, 4 chart types, mock/live data |
-| `components/StatCard.tsx` | `bg-white/[0.04]` dark, white text | `bg-[#e6f1fd]` or `bg-[#edeefc]`, **black text**, variant prop |
-| `components/DashboardSidebar.tsx` | Single section, no tabs | Add "Recently" section, Dashboards/Pages sub-sections |
-| `components/DashboardRightPanel.tsx` | Dark bg, emoji notifs, loan events | **White bg**, icon-badge notifs, avatar activities, contacts list |
-| `components/charts/RewardHistoryChart.tsx` | AreaChart, single data | LineChart, two lines (this / last period), updated colors |
-| `components/charts/CapitalAllocationChart.tsx` | Donut, no legend | Donut + segment legend, updated colors |
-| `components/DashboardTopBar.tsx` | **Doesn't exist** | Create: breadcrumb + search + icon buttons |
-| `components/charts/TrafficByDeviceChart.tsx` | **Doesn't exist** | Create: vertical bar chart, 6 colored bars |
-| `components/charts/TrafficByWebsiteChart.tsx` | **Doesn't exist** | Create: horizontal pill bars |
+| File                                           | Current                                        | Target                                                            |
+| ---------------------------------------------- | ---------------------------------------------- | ----------------------------------------------------------------- |
+| `app/dashboard/layout.tsx`                     | No top bar                                     | Add `<DashboardTopBar />`                                         |
+| `app/dashboard/page.tsx`                       | Dark stat cards, live contract reads, 2 charts | Light stat cards, 4 chart types, mock/live data                   |
+| `components/StatCard.tsx`                      | `bg-white/[0.04]` dark, white text             | `bg-[#e6f1fd]` or `bg-[#edeefc]`, **black text**, variant prop    |
+| `components/DashboardSidebar.tsx`              | Single section, no tabs                        | Add "Recently" section, Dashboards/Pages sub-sections             |
+| `components/DashboardRightPanel.tsx`           | Dark bg, emoji notifs, loan events             | **White bg**, icon-badge notifs, avatar activities, contacts list |
+| `components/charts/RewardHistoryChart.tsx`     | AreaChart, single data                         | LineChart, two lines (this / last period), updated colors         |
+| `components/charts/CapitalAllocationChart.tsx` | Donut, no legend                               | Donut + segment legend, updated colors                            |
+| `components/DashboardTopBar.tsx`               | **Doesn't exist**                              | Create: breadcrumb + search + icon buttons                        |
+| `components/charts/TrafficByDeviceChart.tsx`   | **Doesn't exist**                              | Create: vertical bar chart, 6 colored bars                        |
+| `components/charts/TrafficByWebsiteChart.tsx`  | **Doesn't exist**                              | Create: horizontal pill bars                                      |
 
 ---
 
@@ -565,7 +726,10 @@ Quick placeholder fallback (no images needed):
 ```tsx
 // Instead of <Image>, use initials circle:
 <div className="flex h-7 w-7 items-center justify-center rounded-full bg-zinc-200 text-[11px] font-medium text-zinc-600">
-  {name.split(" ").map(w => w[0]).join("")}
+  {name
+    .split(" ")
+    .map((w) => w[0])
+    .join("")}
 </div>
 ```
 
@@ -573,17 +737,18 @@ Quick placeholder fallback (no images needed):
 
 ## 12. Figma Node IDs Reference
 
-| Frame | Node ID | Size |
-|-------|---------|------|
-| Desktop overview (primary) | `54869:11584` | 1440 × 1024 |
-| Desktop overview (tall scroll) | `54869:6543` | 1440 × 1708 |
-| Mobile | `54869:8610` | 393 × 1767 |
+| Frame                          | Node ID       | Size        |
+| ------------------------------ | ------------- | ----------- |
+| Desktop overview (primary)     | `54869:11584` | 1440 × 1024 |
+| Desktop overview (tall scroll) | `54869:6543`  | 1440 × 1708 |
+| Mobile                         | `54869:8610`  | 393 × 1767  |
 
 To re-fetch design context:
+
 ```
 mcp_com_figma_mcp_get_design_context(fileKey="NG18MHF02rQYRxql9qG084", nodeId="54869:11584")
 ```
 
 ---
 
-*Generated from Figma analysis — SnowUI Dashboard template, HardwareYield customization.*
+_Generated from Figma analysis — SnowUI Dashboard template, Kestrel customization._

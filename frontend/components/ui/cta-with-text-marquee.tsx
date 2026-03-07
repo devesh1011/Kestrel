@@ -115,9 +115,9 @@ export default function CTAWithVerticalMarquee() {
               Join the DePIN Lending Revolution
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground leading-relaxed animate-fade-in-up [animation-delay:400ms]">
-              Be among the first to access HardwareYield - the DePIN-native
-              lending protocol that lets node operators borrow CTC against
-              verifiable rewards while lenders earn yield.
+              Be among the first to access Kestrel - the DePIN-native lending
+              protocol that lets node operators borrow CTC against verifiable
+              rewards while lenders earn yield.
             </p>
             <div className="flex flex-wrap gap-4 animate-fade-in-up [animation-delay:600ms]">
               <button className="group relative px-6 py-3 bg-foreground text-background rounded-md font-medium overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-lg">
