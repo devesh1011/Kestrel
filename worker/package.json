@@ -1,6 +1,6 @@
 {
   "name": "worker",
-  "module": "index.ts",
+  "module": "src/index.ts",
   "type": "module",
   "private": true,
   "devDependencies": {
@@ -11,6 +11,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@gluwa/cc-next-query-builder": "^0.8.0",
     "axios": "^1.13.6",
     "dotenv": "^17.3.1",
     "ethers": "^6.16.0"
