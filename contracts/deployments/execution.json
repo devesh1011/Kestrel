@@ -2,9 +2,9 @@
   "network": "ctc_usc_testnet",
   "chainId": 102036,
   "WCTC": "0x8e167dca9b9268ba65967b26cdb8b14edf6a26d7",
-  "KestrelCore": "0xe355455aa417541931b982089e5e0601fad5b8a3",
+  "KestrelCore": "0x923298a6dfc08b309ec8089aba34bbc0ceb992e2",
   "LenderVault": "0x565bc1511e39f55c4f328fe3ea1b920291b8001d",
-  "RevenueEscrow": "0xdaac409c8b353cae8959f7940a000d1037a1778b",
+  "RevenueEscrow": "0xea48590b8eb04bc8569454b96a59c7bdeee2ee3c",
   "RevenueUSC": "0x8617c980e8febd13c40fd2c2a7d7514dd2116afa",
   "oracleWorker": "0x9db2507a09137c9fbe3f9f5404d4858b5c67af6b",
   "deployedAt": "2026-03-07T17:27:01.996Z"
