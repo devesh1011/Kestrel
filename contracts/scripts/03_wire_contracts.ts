@@ -4,9 +4,9 @@
  * Run:    npx hardhat run scripts/03_wire_contracts.ts --network ctc_usc_testnet
  *
  * Reads deployments/execution.json and wires the contracts together:
- *   - HardwareYieldCore.setUscContract(RevenueUSC)
- *   - HardwareYieldCore.setLenderVault(LenderVault)
- *   - HardwareYieldCore.setRevenueEscrow(RevenueEscrow)
+ *   - KestrelCore.setUscContract(RevenueUSC)
+ *   - KestrelCore.setLenderVault(LenderVault)
+ *   - KestrelCore.setRevenueEscrow(RevenueEscrow)
  *
  * Run AFTER 02_deploy_execution.ts
  */
@@ -50,17 +50,15 @@ if (!fs.existsSync(executionPath)) {
 const addrs = JSON.parse(fs.readFileSync(executionPath, "utf-8"));
 
 console.log("\nUsing addresses:");
-console.log("  HardwareYieldCore:", addrs.HardwareYieldCore);
+console.log("  KestrelCore:", addrs.KestrelCore);
 console.log("  LenderVault      :", addrs.LenderVault);
 console.log("  RevenueEscrow    :", addrs.RevenueEscrow);
 console.log("  RevenueUSC       :", addrs.RevenueUSC);
 
-// ── Attach to HardwareYieldCore ────────────────────────────────────────────
-const core = await viem.getContractAt(
-  "HardwareYieldCore",
-  addrs.HardwareYieldCore,
-  { client: { public: publicClient, wallet: deployer } },
-);
+// ── Attach to KestrelCore ────────────────────────────────────────────
+const core = await viem.getContractAt("KestrelCore", addrs.KestrelCore, {
+  client: { public: publicClient, wallet: deployer },
+});
 
 // ── Wire 1: set USC contract ────────────────────────────────────────────────
 console.log("\n[1/3] setUscContract →", addrs.RevenueUSC);
@@ -91,7 +89,7 @@ const [uscSet, vaultSet, escrowSet] = await Promise.all([
   core.read.lenderVault(),
   core.read.revenueEscrow(),
 ]);
-console.log("\n─── Final HardwareYieldCore state ───");
+console.log("\n─── Final KestrelCore state ───");
 console.log("  uscContract  :", uscSet);
 console.log("  lenderVault  :", vaultSet);
 console.log("  revenueEscrow:", escrowSet);
@@ -111,7 +109,7 @@ console.log("Add to your .env:");
 console.log(`SPACE_REWARD_EMITTER_ADDRESS=<from deployments/source.json>`);
 console.log(`CTC_USC_RPC_URL=https://rpc.usc-testnet2.creditcoin.network`);
 console.log(`REVENUE_USC_ADDRESS=${addrs.RevenueUSC}`);
-console.log(`HARDWARE_YIELD_CORE_ADDRESS=${addrs.HardwareYieldCore}`);
+console.log(`HARDWARE_YIELD_CORE_ADDRESS=${addrs.KestrelCore}`);
 console.log(`LENDER_VAULT_ADDRESS=${addrs.LenderVault}`);
 console.log(`REVENUE_ESCROW_ADDRESS=${addrs.RevenueEscrow}`);
 console.log(`WCTC_ADDRESS=${addrs.WCTC}`);
@@ -119,7 +117,7 @@ console.log(`NEXT_PUBLIC_CTC_USC_CHAIN_ID=102036`);
 console.log(
   `NEXT_PUBLIC_CTC_USC_RPC=https://rpc.usc-testnet2.creditcoin.network`,
 );
-console.log(`NEXT_PUBLIC_HARDWARE_YIELD_CORE=${addrs.HardwareYieldCore}`);
+console.log(`NEXT_PUBLIC_HARDWARE_YIELD_CORE=${addrs.KestrelCore}`);
 console.log(`NEXT_PUBLIC_LENDER_VAULT=${addrs.LenderVault}`);
 console.log(`NEXT_PUBLIC_WCTC=${addrs.WCTC}`);
 console.log(`NEXT_PUBLIC_CTC_TESTNET_CHAIN_ID=102031`);

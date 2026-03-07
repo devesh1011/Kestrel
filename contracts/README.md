@@ -1,57 +1,153 @@
-# Sample Hardhat 3 Beta Project (`node:test` and `viem`)
+# Kestrel Contracts
 
-This project showcases a Hardhat 3 Beta project using the native Node.js test runner (`node:test`) and the `viem` library for Ethereum interactions.
+**Kestrel** is a DePIN-native micro-lending protocol on Creditcoin that turns verifiable on-chain reward history into creditworthiness. Node operators borrow CTC against their proven rewards without posting collateral. Lenders earn yield from loan interest in an ERC-4626 vault.
 
-To learn more about the Hardhat 3 Beta, please visit the [Getting Started guide](https://hardhat.org/docs/getting-started#getting-started-with-hardhat-3). To share your feedback, join our [Hardhat 3 Beta](https://hardhat.org/hardhat3-beta-telegram-group) Telegram group or [open an issue](https://github.com/NomicFoundation/hardhat/issues/new) in our GitHub issue tracker.
+This folder contains the Solidity smart contracts, deployment scripts, and configuration for Kestrel.
 
-## Project Overview
+## Architecture
 
-This example project includes:
+Kestrel spans two Creditcoin networks:
 
-- A simple Hardhat configuration file.
-- Foundry-compatible Solidity unit tests.
-- TypeScript integration tests using [`node:test`](nodejs.org/api/test.html), the new Node.js native test runner, and [`viem`](https://viem.sh/).
-- Examples demonstrating how to connect to different types of networks, including locally simulating OP mainnet.
+- **Source Chain**: Creditcoin Testnet cc3 (Chain ID 102031) — where Spacecoin reward events originate
+- **Execution Chain**: Creditcoin USC Testnet v2 (Chain ID 102036) — where lending contracts live and USC precompile verifies cross-chain proofs
 
-## Usage
-
-### Running Tests
-
-To run all the tests in the project, execute the following command:
-
-```shell
-npx hardhat test
+```
+Source Chain (cc3)                    Execution Chain (USC v2)
+┌────────────────────┐                    ┌─────────────────────┐
+│ SpaceRewardEmitter │ ── RewardClaimed ──► │ RevenueUSC        │
+│ (0x372...)         │                    │ (0x111...)          │
+└────────────────────┘                    └─────────────────────┘
+                                              │
+                                              ▼
+                                       ┌─────────────────────┐
+                                       │ HardwareYieldCore   │
+                                       │ (0x7daf...)         │
+                                       └─────────────────────┘
+                                              │
+                                              ▼
+                                       ┌─────────────────────┐
+                                       │ LenderVault         │
+                                       │ (0x6d88...)         │
+                                       └─────────────────────┘
+                                              │
+                                              ▼
+                                       ┌─────────────────────┐
+                                       │ RevenueEscrow       │
+                                       │ (0x39e8...)         │
+                                       └─────────────────────┘
 ```
 
-You can also selectively run the Solidity or `node:test` tests:
+## Contracts
 
-```shell
-npx hardhat test solidity
-npx hardhat test nodejs
+### Source Chain Contracts
+
+#### SpaceRewardEmitter.sol
+
+- **Chain**: Creditcoin Testnet cc3 (102031)
+- **Address**: `0x372bd93f70dfd866e17a17aba51e47eebeb4859e`
+- **Purpose**: Emits `RewardClaimed(address indexed nodeWallet, uint256 amount, uint256 timestamp)` events when node operators claim Spacecoin rewards
+- **Role**: Source of verifiable reward history for credit underwriting
+
+### Execution Chain Contracts
+
+#### WCTC.sol
+
+- **Chain**: Creditcoin USC Testnet v2 (102036)
+- **Address**: `0x978524ae39575aaf308330466d29419a2affeef6`
+- **Purpose**: ERC-20 wrapper for native CTC token (1:1 peg)
+- **Role**: Underlying asset for the ERC-4626 vault
+
+#### HardwareYieldCore.sol
+
+- **Chain**: Creditcoin USC Testnet v2 (102036)
+- **Address**: `0x7daf425b9428ee97c1e52b094e2db42637265d73`
+- **Purpose**: Core lending logic — credit scoring, loan origination, repayment tracking
+- **Key Functions**:
+  - `getScore(wallet)`: Returns max loan amount based on 90-day reward history
+  - `applyForLoan(amount, escrowBps)`: Creates loan with auto-repayment commitment
+  - `recordVerifiedReward(wallet, amount, timestamp)`: Updates credit history (called by RevenueUSC)
+
+#### LenderVault.sol
+
+- **Chain**: Creditcoin USC Testnet v2 (102036)
+- **Address**: `0x6d8807ae9e75ca4307df6e9d0b40bacadb5f7fca`
+- **Purpose**: ERC-4626 vault for lenders — deposit WCTC, earn yield from loan interest
+- **Key Functions**:
+  - `deposit(amount, lender)`: Mint hvWCTC shares
+  - `withdraw(assets, receiver, owner)`: Burn shares for WCTC + yield
+  - `disburseLoan(borrower, amount)`: Only callable by HardwareYieldCore
+
+#### RevenueEscrow.sol
+
+- **Chain**: Creditcoin USC Testnet v2 (102036)
+- **Address**: `0x39e86627b3438d141ba581581ae79416495eac80`
+- **Purpose**: Manages auto-repayment — redirects portion of future rewards to vault
+- **Key Functions**:
+  - `redirectReward(escrowId, amount)`: Splits reward (commitBps% to vault, rest to borrower)
+  - `liquidateEscrow(escrowId)`: 100% redirect on default
+
+#### RevenueUSC.sol
+
+- **Chain**: Creditcoin USC Testnet v2 (102036)
+- **Address**: `0x111ea01f8ffc0d9d2ba88578a45d762672db255a`
+- **Purpose**: USC cross-chain proof verification and reward recording
+- **Key Functions**:
+  - `processRewardProof(txData, merkleProof, continuityProof)`: Verifies proof via 0x0FD2 precompile, calls HardwareYieldCore.recordVerifiedReward
+
+## Deployment
+
+All deployments use Bun as the package manager. Scripts are in TypeScript with Hardhat + ethers v6.
+
+### Prerequisites
+
+```bash
+# Install dependencies
+bun install
+
+# Set environment variables in .env
+DEPLOYER_PRIVATE_KEY=<your-private-key>
+SEPOLIA_RPC_URL=<alchemy-or-infura-url>
+CTC_TESTNET_RPC_URL=https://rpc.cc3-testnet.creditcoin.network
+CTC_USC_RPC_URL=https://rpc.usc-testnet2.creditcoin.network
 ```
 
-### Make a deployment to Sepolia
+### Deploy Sequence
 
-This project includes an example Ignition module to deploy the contract. You can deploy this module to a locally simulated chain or to Sepolia.
+1. **Deploy Source Contract** (Sepolia or cc3):
 
-To run the deployment to a local chain:
+   ```bash
+   bunx hardhat run scripts/01_deploy_source.ts --network sepolia
+   # or
+   bunx hardhat run scripts/01_deploy_source.ts --network ctc_testnet
+   ```
 
-```shell
-npx hardhat ignition deploy ignition/modules/Counter.ts
+2. **Deploy Execution Contracts** (USC Testnet v2):
+
+   ```bash
+   bunx hardhat run scripts/02_deploy_execution.ts --network ctc_usc_testnet
+   ```
+
+3. **Wire Contracts** (set cross-contract addresses):
+   ```bash
+   bunx hardhat run scripts/03_wire_contracts.ts --network ctc_usc_testnet
+   ```
+
+### Network Configuration
+
+Networks are defined in [hardhat.config.ts](hardhat.config.ts):
+
+- `sepolia`: Sepolia testnet (source chain)
+- `ctc_testnet`: Creditcoin Testnet cc3 (source chain, wallet funding)
+- `ctc_usc_testnet`: Creditcoin USC Testnet v2 (execution chain)
+
+## Testing
+
+Run tests with:
+
+```bash
+bunx hardhat test
 ```
 
-To run the deployment to Sepolia, you need an account with funds to send the transaction. The provided Hardhat configuration includes a Configuration Variable called `SEPOLIA_PRIVATE_KEY`, which you can use to set the private key of the account you want to use.
+Tests use Foundry-compatible Solidity unit tests and Node.js native test runner with viem for integration tests.
 
-You can set the `SEPOLIA_PRIVATE_KEY` variable using the `hardhat-keystore` plugin or by setting it as an environment variable.
-
-To set the `SEPOLIA_PRIVATE_KEY` config variable using `hardhat-keystore`:
-
-```shell
-npx hardhat keystore set SEPOLIA_PRIVATE_KEY
-```
-
-After setting the variable, you can run the deployment with the Sepolia network:
-
-```shell
-npx hardhat ignition deploy --network sepolia ignition/modules/Counter.ts
-```
+## Development

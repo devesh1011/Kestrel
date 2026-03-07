@@ -5,10 +5,10 @@
  *
  * Deploys execution-chain contracts in order:
  *   1. WCTC                  (no deps)
- *   2. HardwareYieldCore     (deployer address as temp placeholders → wired in script 03)
- *   3. LenderVault           (WCTC + HardwareYieldCore)
- *   4. RevenueEscrow         (HardwareYieldCore + LenderVault + WCTC)
- *   5. RevenueUSC            (HardwareYieldCore + deployer as oracle worker)
+ *   2. KestrelCore     (deployer address as temp placeholders → wired in script 03)
+ *   3. LenderVault           (WCTC + KestrelCore)
+ *   4. RevenueEscrow         (KestrelCore + LenderVault + WCTC)
+ *   5. RevenueUSC            (KestrelCore + deployer as oracle worker)
  *
  * Writes deployed addresses to deployments/execution.json
  */
@@ -51,12 +51,12 @@ const wctc = await viem.deployContract("WCTC", [], {
 });
 console.log("WCTC deployed →", wctc.address);
 
-// ── 2. HardwareYieldCore (temp placeholders — wired in 03) ────────────────
+// ── 2. KestrelCore (temp placeholders — wired in 03) ────────────────
 // All three dependencies are circular: deploy with deployer address as placeholder
 // then set the real addresses via setters in 03_wire_contracts.ts
-console.log("\n[2/5] Deploying HardwareYieldCore (with temp placeholders)...");
+console.log("\n[2/5] Deploying KestrelCore (with temp placeholders)...");
 const core = await viem.deployContract(
-  "HardwareYieldCore",
+  "KestrelCore",
   [
     deployerAddr, // uscContract   — replaced in 03
     deployerAddr, // lenderVault   — replaced in 03
@@ -64,7 +64,7 @@ const core = await viem.deployContract(
   ],
   { client: { public: publicClient, wallet: deployer } },
 );
-console.log("HardwareYieldCore deployed →", core.address);
+console.log("KestrelCore deployed →", core.address);
 
 // ── 3. LenderVault ────────────────────────────────────────────────────────
 console.log("\n[3/5] Deploying LenderVault...");
@@ -105,7 +105,7 @@ const output = {
   network: "ctc_usc_testnet",
   chainId: 102036,
   WCTC: wctc.address,
-  HardwareYieldCore: core.address,
+  KestrelCore: core.address,
   LenderVault: vault.address,
   RevenueEscrow: escrow.address,
   RevenueUSC: uscContract.address,
