@@ -45,11 +45,11 @@ Source Chain (cc3)                    Execution Chain (USC v2)
 | Contract           | Chain           | Address                                      |
 | ------------------ | --------------- | -------------------------------------------- |
 | SpaceRewardEmitter | cc3 (102031)    | `0x372bd93f70dfd866e17a17aba51e47eebeb4859e` |
-| WCTC               | USC v2 (102036) | `0x978524ae39575aaf308330466d29419a2affeef6` |
-| HardwareYieldCore  | USC v2 (102036) | `0x7daf425b9428ee97c1e52b094e2db42637265d73` |
-| LenderVault        | USC v2 (102036) | `0x6d8807ae9e75ca4307df6e9d0b40bacadb5f7fca` |
-| RevenueEscrow      | USC v2 (102036) | `0x39e86627b3438d141ba581581ae79416495eac80` |
-| RevenueUSC         | USC v2 (102036) | `0x111ea01f8ffc0d9d2ba88578a45d762672db255a` |
+| WCTC               | USC v2 (102036) | `0x8e167dca9b9268ba65967b26cdb8b14edf6a26d7` |
+| HardwareYieldCore  | USC v2 (102036) | `0xe355455aa417541931b982089e5e0601fad5b8a3` |
+| LenderVault        | USC v2 (102036) | `0x565bc1511e39f55c4f328fe3ea1b920291b8001d` |
+| RevenueEscrow      | USC v2 (102036) | `0xdaac409c8b353cae8959f7940a000d1037a1778b` |
+| RevenueUSC         | USC v2 (102036) | `0x8617c980e8febd13c40fd2c2a7d7514dd2116afa` |
 
 ## Project Structure
 
@@ -84,8 +84,8 @@ Source Chain (cc3)                    Execution Chain (USC v2)
 
 ```bash
 # Clone the repository
-git clone <repository-url>
-cd ctc-hack
+git clone git@github.com:devesh1011/Kestrel.git
+cd Kestrel
 
 # Install dependencies for all components
 bun install
