@@ -17,7 +17,7 @@ export default function DashboardPage() {
       { ...lenderVaultContract, functionName: "totalLoaned" }, // [1]
       { ...lenderVaultContract, functionName: "totalInterestEarned" }, // [2]
       { ...lenderVaultContract, functionName: "availableLiquidity" }, // [3]
-      { ...hardwareYieldCoreContract, functionName: "nextLoanId" }, // [4]
+      { ...hardwareYieldCoreContract, functionName: "getActiveLoanCount" }, // [4]
     ],
   });
 
@@ -32,12 +32,10 @@ export default function DashboardPage() {
   const totalLoaned = data?.[1]?.result;
   const interestEarned = data?.[2]?.result;
   const availableLiquidity = data?.[3]?.result;
-  const nextLoanId = data?.[4]?.result;
+  const activeLoanCount = data?.[4]?.result;
 
   const totalLoanCount =
-    typeof nextLoanId === "bigint" && nextLoanId > 0n
-      ? (nextLoanId - 1n).toString()
-      : "0";
+    typeof activeLoanCount === "bigint" ? activeLoanCount.toString() : "0";
 
   const loanedNum =
     typeof totalLoaned === "bigint" ? Number(formatUnits(totalLoaned, 18)) : 0;
