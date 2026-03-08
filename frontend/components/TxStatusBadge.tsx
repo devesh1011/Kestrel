@@ -3,7 +3,7 @@
 import { ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
-const BLOCKSCOUT_BASE = "https://creditcoin-testnet.blockscout.com";
+const BLOCKSCOUT_BASE = process.env.NEXT_PUBLIC_CTC_TESTNET_EXPLORER;
 
 interface TxStatusBadgeProps {
   status: "pending" | "confirmed" | "failed";
