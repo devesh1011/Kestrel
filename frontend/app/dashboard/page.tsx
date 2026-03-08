@@ -17,7 +17,7 @@ export default function DashboardPage() {
       { ...lenderVaultContract, functionName: "totalLoaned" }, // [1]
       { ...lenderVaultContract, functionName: "totalInterestEarned" }, // [2]
       { ...lenderVaultContract, functionName: "availableLiquidity" }, // [3]
-      { ...hardwareYieldCoreContract, functionName: "getActiveLoanCount" }, // [4]
+      { ...hardwareYieldCoreContract, functionName: "nextLoanId" }, // [4]
     ],
   });
 
