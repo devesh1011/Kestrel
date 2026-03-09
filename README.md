@@ -1,3 +1,5 @@
+[Kestrel Whitepaper](https://docs.google.com/document/d/1TAmbt-S9jq73q0T8HjvtkdbUEtXkb8w1XIk1hA2GUaY/edit?usp=share_link) <br>
+[Kestrel Demo & Pitch](https://youtu.be/YG4YD8keyj8)
 # Kestrel — DePIN Revenue-Backed Micro-Lending on Creditcoin
 
 **Kestrel** is a micro-lending protocol that turns verifiable DePIN hardware rewards into on-chain creditworthiness. Node operators borrow CTC against their proven reward history without posting collateral. Lenders earn yield from loan interest in an ERC-4626 vault.
